@@ -1,0 +1,130 @@
+# ROSOrin Pro - Isaac Sim configuration (single source of truth for every build/run script).
+# Values marked "spec" come from Hiwonder's published hardware specs, "urdf" from rosorin_description,
+# "estimate" are engineering estimates (documented in docs/DECISIONS.md).
+
+description:
+  # Hiwonder package (xacro + STL). Relative paths are resolved against the repo root.
+  source_package: ../rosorin_description-claude/rosorin_description
+  # Flattened URDF from the RosOrinProMesh build (MACHINE_TYPE=ROSOrin_Mecanum_Pro).
+  resolved_urdf: ../rosorin_description-claude/rosorinpro_resolved.urdf
+  # Wheel frames come from the older xacro of the same chassis (the Pro URDF has no wheel links).
+  wheel_frames_xacro: urdf/rosorin_old.xacro
+  # Lidar variant decides only the lidar_joint yaw. The real robot runs /sclidar_scan_publisher
+  # (COIN-D6 ToF lidar) -> SCLIDAR (yaw = pi). MS200 = 0, LD19 = 3.1416.
+  lidar_variant: SCLIDAR
+  output_urdf: description/urdf/rosorin_pro_sim.urdf
+  output_meshes: description/meshes
+  package_name: rosorin_pro_sim_description
+
+# Link masses [kg]. The CAD masses in the URDF are far too small (arm links ~10 g, chassis 0.81 kg
+# for a 3.6 kg robot). URDF inertia tensors are scaled by (new mass / URDF mass) so the CAD mass
+# distribution and centre of mass are kept. Total = 3.60 kg (spec, Ultimate kit).
+masses:
+  base_link: 2.690        # chassis, 4 motors, 3S 6000 mAh battery, Jetson, STM32 board (estimate = remainder)
+  lidar_frame: 0.045      # COIN-D6 (estimate)
+  imu_link: null          # URDF copies the chassis inertial onto imu_link by mistake -> removed (massless frame)
+  link1: 0.090            # HX-12H servo 36.3 g (spec) + brackets (estimate)
+  link2: 0.080
+  link3: 0.080
+  link4: 0.070
+  link5: 0.045
+  gripper_link: 0.060
+  l_link: 0.008
+  r_link: 0.008
+  l_in_link: 0.004
+  r_in_link: 0.004
+  l_out_link: 0.008
+  r_out_link: 0.008
+  camera_link0: 0.005
+  camera_link: 0.035      # Aurora 930 Pro module (estimate)
+  wheel_hub: 0.045        # per wheel, hub + cap + roller pins (estimate)
+  roller: 0.005           # per roller, 9 per wheel (estimate)
+
+wheels:
+  names: [left_front_wheel, left_back_wheel, right_front_wheel, right_back_wheel]
+  axis: [0.0, 1.0, 0.0]          # in the wheel frame; positive rotation rolls the robot forward
+  radial_max: 0.045              # m, loose parts inside this radius and outboard of the frame -> wheel
+  inner_tolerance: 0.0005
+  roller_outer_tolerance: 0.0005 # parts reaching (outer radius - tol) are rollers
+  expected_rollers: 9
+
+drives:
+  # HX-12H bus servo (spec): stall 12 kg*cm @ 11 V = 1.18 N*m, 0.2 s / 60 deg = 5.24 rad/s, 0..240 deg.
+  arm:
+    joints: [joint1, joint2, joint3, joint4, joint5]
+    stiffness: 60.0        # N*m/rad   (position drive)
+    damping: 2.0           # N*m*s/rad
+    max_effort: 1.18       # N*m
+    max_velocity: 5.24     # rad/s
+  gripper:
+    joint: r_joint         # the only independent gripper joint (others are URDF mimics)
+    stiffness: 20.0
+    damping: 0.5
+    max_effort: 1.18
+    max_velocity: 5.24
+    # finger gap measured from the meshes (docs/DECISIONS.md): r_joint 0 -> 37 mm, +0.9 -> 58 mm (max),
+    # -0.65 -> fingers touch. Positive opens. Limits keep the fingers from passing through each other.
+    open: 0.9
+    closed: -0.65
+    limits: [-0.70, 1.00]
+  # 12 V DC gear motor 1:90 (spec): no-load 110 rpm = 11.52 rad/s, stall 15 kg*cm = 1.47 N*m.
+  wheel:
+    damping: 2.0           # velocity-drive gain, N*m*s/rad
+    max_effort: 1.47
+    max_velocity: 11.52
+  roller:
+    damping: 0.0005        # free-spinning rollers, tiny bearing friction
+
+# Arm start pose, like the real robot's /init_pose node: arm folded, wrist camera looking ahead and 45 deg
+# down (optical axis hits the floor ~0.49 m in front), gripper 20 cm above the floor. Radians.
+init_pose:
+  joint1: 0.0
+  joint2: 0.0
+  joint3: 1.5708
+  joint4: 0.7854
+  joint5: 0.0
+  r_joint: 0.0
+
+physics:
+  # tuned with tests/tune_mecanum.py (docs/DECISIONS.md): compliant rubber rollers + 480 Hz gave the best
+  # tracking (forward 97 %, strafe 90 %, rotate 96 % of command) and the least wheel jitter.
+  steps_per_second: 480
+  solver_position_iterations: 32
+  solver_velocity_iterations: 4
+  ground_static_friction: 0.9
+  ground_dynamic_friction: 0.8
+  roller_static_friction: 1.0
+  roller_dynamic_friction: 0.9
+  roller_compliant_stiffness: 8000.0   # N/m  - rubber roller contact (rigid contacts lose a wheel -> jitter)
+  roller_compliant_damping: 100.0      # N*s/m
+
+sensors:
+  lidar:
+    model: COIN-D6          # spec: 360 deg, 4000 samples/s, 10 Hz, 0.9 deg, 0.05-12 m, +-10/40 mm
+    frame_id: lidar_frame
+    rate_hz: 10.0
+    samples_per_rev: 400
+    range_min: 0.05
+    range_max: 12.0
+  depth_camera:
+    model: Aurora 930 Pro   # spec: RGB/depth/IR 640x400, H71 x V46 deg, 0.15-3 m, up to 15 fps
+    frame_id: depth_cam_frame
+    width: 640
+    height: 400
+    hfov_deg: 71.0
+    fps: 15
+    depth_min: 0.15
+    depth_max: 3.0
+  imu:
+    model: MPU6050          # spec, 6-axis, on the STM32 controller
+    frame_id: imu_link
+    rate_hz: 100.0
+
+battery:
+  # 3S 11.1 V 6000 mAh (spec). Published like the real ros_robot_controller: std_msgs/UInt16 in mV.
+  full_mv: 12600
+  empty_mv: 9900
+  low_warning_mv: 10000
+  capacity_mah: 6000
+  idle_current_a: 1.2       # Jetson + sensors (estimate)
+  drive_current_a_per_mps: 3.0

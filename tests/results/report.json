@@ -1,0 +1,426 @@
+{
+  "checks": [
+    {
+      "check": "scene opened",
+      "pass": true,
+      "detail": "C:\\isaac-sim-standalone-6.2.0\\RosOrin_Claude.usd"
+    },
+    {
+      "check": "articulation loaded",
+      "pass": true,
+      "detail": "dofs=51 links=52"
+    },
+    {
+      "check": "robot rests on its rollers (base_footprint z ~ 0, upright)",
+      "pass": true,
+      "detail": "z=-0.0029 m tilt=0.11 deg"
+    },
+    {
+      "check": "arm starts in the init pose (camera looks ahead/down)",
+      "pass": true,
+      "detail": "{'joint1': -0.0, 'joint2': 0.007, 'joint3': 1.578, 'joint4': 0.787, 'joint5': 0.0, 'r_joint': -0.0}"
+    },
+    {
+      "check": "drive: forward 0.2 m/s",
+      "pass": true,
+      "detail": "cmd=(0.20, 0.00, 0.00) measured=(0.194, -0.000, -0.001) odom=(np.float64(0.194), np.float64(0.0), np.float64(-0.001))"
+    },
+    {
+      "check": "drive: strafe left 0.2 m/s",
+      "pass": true,
+      "detail": "cmd=(0.00, 0.20, 0.00) measured=(-0.000, 0.182, -0.000) odom=(np.float64(-0.0), np.float64(0.182), np.float64(0.004))"
+    },
+    {
+      "check": "drive: rotate 1.0 rad/s",
+      "pass": true,
+      "detail": "cmd=(0.00, 0.00, 1.00) measured=(-0.000, -0.000, 0.960) odom=(np.float64(0.0), np.float64(-0.021), np.float64(0.962))"
+    },
+    {
+      "check": "drive: diagonal 0.15/0.15",
+      "pass": true,
+      "detail": "cmd=(0.15, -0.15, 0.00) measured=(0.145, -0.135, 0.004) odom=(np.float64(0.146), np.float64(-0.134), np.float64(0.003))"
+    },
+    {
+      "check": "arm + gripper follow /joint_command",
+      "pass": true,
+      "detail": "max error 0.0042 rad"
+    },
+    {
+      "check": "gripper mimic joints follow r_joint (4-bar linkage)",
+      "pass": true,
+      "detail": "max error 0.0000 rad"
+    },
+    {
+      "check": "topic /clock",
+      "pass": true,
+      "detail": "1676 msgs, 60.0 Hz sim time"
+    },
+    {
+      "check": "topic /scan",
+      "pass": true,
+      "detail": "278 msgs, 9.9 Hz sim time (expected ~10)"
+    },
+    {
+      "check": "topic /scan_raw",
+      "pass": true,
+      "detail": "278 msgs, 9.9 Hz sim time"
+    },
+    {
+      "check": "topic /odom",
+      "pass": true,
+      "detail": "1676 msgs, 60.0 Hz sim time (expected ~60)"
+    },
+    {
+      "check": "topic /odom_raw",
+      "pass": true,
+      "detail": "1676 msgs, 60.0 Hz sim time"
+    },
+    {
+      "check": "topic /imu",
+      "pass": true,
+      "detail": "1676 msgs, 60.0 Hz sim time (expected ~60)"
+    },
+    {
+      "check": "topic /imu_corrected",
+      "pass": true,
+      "detail": "1676 msgs, 60.0 Hz sim time"
+    },
+    {
+      "check": "topic /ros_robot_controller/imu_raw",
+      "pass": true,
+      "detail": "1676 msgs, 60.0 Hz sim time"
+    },
+    {
+      "check": "topic /joint_states",
+      "pass": true,
+      "detail": "1676 msgs, 60.0 Hz sim time"
+    },
+    {
+      "check": "topic /controller_manager/joint_states",
+      "pass": true,
+      "detail": "1676 msgs, 60.0 Hz sim time"
+    },
+    {
+      "check": "topic /tf",
+      "pass": true,
+      "detail": "1676 msgs, 60.0 Hz sim time"
+    },
+    {
+      "check": "topic /depth_cam/rgb/image_raw",
+      "pass": true,
+      "detail": "417 msgs, 14.9 Hz sim time (expected ~15)"
+    },
+    {
+      "check": "topic /depth_cam/rgb/camera_info",
+      "pass": true,
+      "detail": "417 msgs, 14.9 Hz sim time"
+    },
+    {
+      "check": "topic /depth_cam/depth0/image_raw",
+      "pass": true,
+      "detail": "417 msgs, 14.9 Hz sim time (expected ~15)"
+    },
+    {
+      "check": "topic /depth_cam/depth0/camera_info",
+      "pass": true,
+      "detail": "417 msgs, 14.9 Hz sim time"
+    },
+    {
+      "check": "topic /depth_cam/depth0/points",
+      "pass": true,
+      "detail": "417 msgs, 14.9 Hz sim time"
+    },
+    {
+      "check": "topic /depth_cam/iro/image_raw",
+      "pass": true,
+      "detail": "417 msgs, 14.9 Hz sim time"
+    },
+    {
+      "check": "lidar: COIN-D6 400 samples/scan, 0.05-12 m, frame lidar_frame",
+      "pass": true,
+      "detail": "{\"frame_id\": \"lidar_frame\", \"n\": 400, \"angle_min\": -3.1415927410125732, \"angle_max\": 3.125884771347046, \"angle_increment\": 0.015707962214946747, \"range_min\": 0.05000000074505806, \"range_max\": 12.0, \"valid\": 250, \"min\": 0.9930792450904846, \"max\": 3.560117483139038}"
+    },
+    {
+      "check": "rgb camera 640x400 rgb8, frame depth_cam_frame",
+      "pass": true,
+      "detail": "640x400 rgb8 depth_cam_frame"
+    },
+    {
+      "check": "depth image 32FC1, sees the floor, within 0.15-3 m",
+      "pass": true,
+      "detail": "{\"encoding\": \"32FC1\", \"valid_fraction\": 1.0, \"min\": 0.26394468545913696, \"max\": 0.6941846013069153}"
+    },
+    {
+      "check": "camera_info: HFOV ~71 deg (Aurora 930 Pro)",
+      "pass": true,
+      "detail": "hfov=71.00 fx=448.6"
+    },
+    {
+      "check": "imu at rest measures gravity ~9.81 along +z",
+      "pass": true,
+      "detail": "acc=(0.02, 0.06, 9.80)"
+    },
+    {
+      "check": "/joint_states has the arm + gripper joints",
+      "pass": true,
+      "detail": "51 joints"
+    },
+    {
+      "check": "/tf has odom->base_footprint and the robot frames",
+      "pass": true,
+      "detail": "24 pairs"
+    }
+  ],
+  "topics": {
+    "/clock": {
+      "messages": 1676,
+      "rate_hz_sim": 60.00000000000341
+    },
+    "/scan": {
+      "messages": 278,
+      "rate_hz_sim": 9.944751381216035
+    },
+    "/scan_raw": {
+      "messages": 278,
+      "rate_hz_sim": 9.944751381216035
+    },
+    "/odom": {
+      "messages": 1676,
+      "rate_hz_sim": 60.00000000000341
+    },
+    "/odom_raw": {
+      "messages": 1676,
+      "rate_hz_sim": 60.00000000000341
+    },
+    "/imu": {
+      "messages": 1676,
+      "rate_hz_sim": 60.00000000000341
+    },
+    "/imu_corrected": {
+      "messages": 1676,
+      "rate_hz_sim": 60.00000000000341
+    },
+    "/ros_robot_controller/imu_raw": {
+      "messages": 1676,
+      "rate_hz_sim": 60.00000000000341
+    },
+    "/joint_states": {
+      "messages": 1676,
+      "rate_hz_sim": 60.00000000000341
+    },
+    "/controller_manager/joint_states": {
+      "messages": 1676,
+      "rate_hz_sim": 60.00000000000341
+    },
+    "/tf": {
+      "messages": 1676,
+      "rate_hz_sim": 60.00000000000341
+    },
+    "/depth_cam/rgb/image_raw": {
+      "messages": 417,
+      "rate_hz_sim": 14.917127071824053
+    },
+    "/depth_cam/rgb/camera_info": {
+      "messages": 417,
+      "rate_hz_sim": 14.917127071824053
+    },
+    "/depth_cam/depth0/image_raw": {
+      "messages": 417,
+      "rate_hz_sim": 14.917127071824053
+    },
+    "/depth_cam/depth0/camera_info": {
+      "messages": 417,
+      "rate_hz_sim": 14.917127071824053
+    },
+    "/depth_cam/depth0/points": {
+      "messages": 417,
+      "rate_hz_sim": 14.917127071824053
+    },
+    "/depth_cam/iro/image_raw": {
+      "messages": 417,
+      "rate_hz_sim": 14.917127071824053
+    }
+  },
+  "phases": {
+    "settle": {
+      "pos": [
+        -0.0003208369016647339,
+        1.9295017409604043e-05,
+        -0.0028821974992752075
+      ],
+      "yaw": 0.00017743915196848073,
+      "tilt_deg": 0.11014342980975618
+    },
+    "forward 0.2 m/s": {
+      "cmd": [
+        0.2,
+        0.0,
+        0.0
+      ],
+      "measured_body_vel": [
+        "0.19403002",
+        "-0.00012284204",
+        -0.0005914025341169841
+      ],
+      "odom_twist": [
+        0.1941678298382099,
+        0.0003336427297954026,
+        -0.00091009781789824
+      ],
+      "tilt_deg": 0.18871159039859822
+    },
+    "strafe left 0.2 m/s": {
+      "cmd": [
+        0.0,
+        0.2,
+        0.0
+      ],
+      "measured_body_vel": [
+        "-0.0002133185",
+        "0.18223983",
+        -0.00018907221123444848
+      ],
+      "odom_twist": [
+        -0.00046830120994412747,
+        0.18195074444043138,
+        0.004271408915519715
+      ],
+      "tilt_deg": 0.07912937001338383
+    },
+    "rotate 1.0 rad/s": {
+      "cmd": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "measured_body_vel": [
+        "-0.00042441033",
+        "-7.55369e-05",
+        0.9596320664015586
+      ],
+      "odom_twist": [
+        0.00015096946039625455,
+        -0.020999045406408783,
+        0.9617220252752304
+      ],
+      "tilt_deg": 0.09278741380920028
+    },
+    "diagonal 0.15/0.15": {
+      "cmd": [
+        0.15,
+        -0.15,
+        0.0
+      ],
+      "measured_body_vel": [
+        "0.14530422",
+        "-0.13474838",
+        0.003680950973357606
+      ],
+      "odom_twist": [
+        0.14569827383372164,
+        -0.13436492085318635,
+        0.0025317648216906436
+      ],
+      "tilt_deg": 0.06561060592844098
+    },
+    "arm": {
+      "target": {
+        "joint1": 0.5,
+        "joint2": -0.6,
+        "joint3": 0.8,
+        "joint4": 0.6,
+        "joint5": -0.4,
+        "r_joint": 0.5
+      },
+      "reached": {
+        "joint1": 0.5000075101852417,
+        "joint2": -0.6000651717185974,
+        "joint3": 0.8041537404060364,
+        "joint4": 0.6018054485321045,
+        "joint5": -0.40004798769950867,
+        "r_joint": 0.5002138018608093,
+        "l_joint": 0.5002158880233765,
+        "l_in_joint": -0.5002222657203674,
+        "l_out_joint": 0.5002251267433167,
+        "r_in_joint": 0.5002390742301941,
+        "r_out_joint": -0.5002361536026001
+      }
+    }
+  },
+  "articulation": {
+    "num_dofs": 51,
+    "num_links": 52
+  },
+  "scan": {
+    "frame_id": "lidar_frame",
+    "n": 400,
+    "angle_min": -3.1415927410125732,
+    "angle_max": 3.125884771347046,
+    "angle_increment": 0.015707962214946747,
+    "range_min": 0.05000000074505806,
+    "range_max": 12.0,
+    "valid": 250,
+    "min": 0.9930792450904846,
+    "max": 3.560117483139038
+  },
+  "depth": {
+    "encoding": "32FC1",
+    "valid_fraction": 1.0,
+    "min": 0.26394468545913696,
+    "max": 0.6941846013069153
+  },
+  "camera_info": {
+    "k": [
+      448.62345718339964,
+      0.0,
+      320.0,
+      0.0,
+      448.62345718339964,
+      200.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "hfov_deg": 70.99999964365077,
+    "frame_id": "depth_cam_frame"
+  },
+  "imu": {
+    "frame_id": "imu_link",
+    "acc": [
+      0.024565264582633972,
+      0.05900467932224274,
+      9.801700592041016
+    ],
+    "|g|": 9.801908972257554
+  },
+  "tf_pairs": [
+    "base_footprint -> base_link",
+    "base_footprint -> camera_link",
+    "base_footprint -> camera_link0",
+    "base_footprint -> depth_cam_frame",
+    "base_footprint -> end_effector_link",
+    "base_footprint -> gripper_link",
+    "base_footprint -> imu_link",
+    "base_footprint -> l_in_link",
+    "base_footprint -> l_link",
+    "base_footprint -> l_out_link",
+    "base_footprint -> left_back_wheel_link",
+    "base_footprint -> left_front_wheel_link",
+    "base_footprint -> lidar_frame",
+    "base_footprint -> link1",
+    "base_footprint -> link2",
+    "base_footprint -> link3",
+    "base_footprint -> link4",
+    "base_footprint -> link5",
+    "base_footprint -> r_in_link",
+    "base_footprint -> r_link",
+    "base_footprint -> r_out_link",
+    "base_footprint -> right_back_wheel_link",
+    "base_footprint -> right_front_wheel_link",
+    "odom -> base_footprint"
+  ],
+  "summary": {
+    "passed": 34,
+    "failed": 0
+  }
+}

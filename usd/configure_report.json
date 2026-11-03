@@ -1,0 +1,153 @@
+{
+  "checks": [
+    {
+      "check": "mesh holders renamed to *_visual / *_collision",
+      "pass": true,
+      "detail": "108 prims"
+    },
+    {
+      "check": "exactly one articulation root",
+      "pass": true,
+      "detail": "['/rosorin_pro/Geometry/base_footprint']"
+    },
+    {
+      "check": "articulation root is base_footprint",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "rigid bodies",
+      "pass": true,
+      "detail": "52 (1 base + 4 wheels + 36 rollers + 5 arm + 6 gripper)"
+    },
+    {
+      "check": "bodies + frames match URDF forward kinematics",
+      "pass": true,
+      "detail": "max pos err 2.71e-06 m (end_effector_link), max rot err 1.08e-05 rad"
+    },
+    {
+      "check": "joint drives configured",
+      "pass": true,
+      "detail": "{'arm': 5, 'gripper': 1, 'mimic': 5, 'wheel': 4, 'roller': 36}"
+    },
+    {
+      "check": "colliders configured",
+      "pass": true,
+      "detail": "{'convexHull': 51, 'convexDecomposition': 1}"
+    },
+    {
+      "check": "sensors created",
+      "pass": true,
+      "detail": "/rosorin_pro/Geometry/base_footprint/base_link/lidar_frame/coin_d6, /rosorin_pro/Geometry/base_footprint/base_link/imu_link/imu_sensor, ['/rosorin_pro/Geometry/base_footprint/link1/link2/link3/link4/camera_link0/camera_link/depth_cam_frame/rgb_camera', '/rosorin_pro/Geometry/base_footprint/link1/link2/link3/link4/camera_link0/camera_link/depth_cam_frame/depth_camera']"
+    },
+    {
+      "check": "graphs created",
+      "pass": true,
+      "detail": "['MecanumDrive', 'ArmGripper', 'RobotState', 'Lidar', 'DepthCamera']"
+    }
+  ],
+  "mimic": [
+    {
+      "joint": "l_joint",
+      "leader": "r_joint",
+      "multiplier": 1.0,
+      "offset": 0.0,
+      "axis": "rotX"
+    },
+    {
+      "joint": "l_in_joint",
+      "leader": "r_joint",
+      "multiplier": -1.0,
+      "offset": 0.0,
+      "axis": "rotX"
+    },
+    {
+      "joint": "l_out_joint",
+      "leader": "r_joint",
+      "multiplier": 1.0,
+      "offset": 0.0,
+      "axis": "rotX"
+    },
+    {
+      "joint": "r_in_joint",
+      "leader": "r_joint",
+      "multiplier": 1.0,
+      "offset": 0.0,
+      "axis": "rotX"
+    },
+    {
+      "joint": "r_out_joint",
+      "leader": "r_joint",
+      "multiplier": -1.0,
+      "offset": 0.0,
+      "axis": "rotX"
+    }
+  ],
+  "camera": {
+    "focal_length": 2.523506930057405,
+    "h_aperture": 3.6,
+    "v_aperture": 2.25,
+    "hfov_deg": 71.0,
+    "vfov_deg": 48.055406340018465
+  },
+  "mecanum_ik": {
+    "wheels": [
+      "left_front_wheel",
+      "left_back_wheel",
+      "right_front_wheel",
+      "right_back_wheel"
+    ],
+    "contact_x_y_ux_uy_r": [
+      [
+        0.09099559817003013,
+        0.08694175415040113,
+        0.7029300912190779,
+        -0.6953481541050189,
+        0.04000099380705413
+      ],
+      [
+        -0.08058967078421898,
+        0.08671278380209829,
+        0.7069104879886106,
+        0.6936371046697896,
+        0.04008201350211436
+      ],
+      [
+        0.09096982122499778,
+        -0.08677925290520687,
+        0.7094986317753926,
+        0.6904806218673851,
+        0.03999952505259585
+      ],
+      [
+        -0.0806103954400596,
+        -0.08700328694624763,
+        0.704020702892001,
+        -0.6945356229367337,
+        0.040082005493226755
+      ]
+    ],
+    "matrix_rows_vx_vy_wz": [
+      [
+        24.999378886022853,
+        24.94884644323692,
+        25.000296845652244,
+        24.94885142832947
+      ],
+      [
+        -24.72973084993489,
+        24.480391656060494,
+        24.330167444663832,
+        -24.612722320736886
+      ],
+      [
+        -4.423786504295,
+        -4.136250631974809,
+        4.382818065489432,
+        4.154673358929231
+      ]
+    ]
+  },
+  "output": "C:\\isaac-sim-standalone-6.2.0\\RosOrinPro-IsaacSim\\usd\\rosorin_pro.usd",
+  "renamed": 108
+}

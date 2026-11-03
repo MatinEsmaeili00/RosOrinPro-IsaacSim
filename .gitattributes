@@ -1,0 +1,9 @@
+*.bat text eol=crlf
+*.py text eol=lf
+*.md text eol=lf
+*.yaml text eol=lf
+*.usda text eol=lf
+*.urdf text eol=lf
+*.stl binary
+*.usd binary
+*.png binary
