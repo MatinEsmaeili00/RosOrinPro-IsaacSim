@@ -85,6 +85,7 @@ TOPICS = {
 }
 LAST, COUNT, STAMPS = {}, {t: 0 for t in TOPICS}, {t: [] for t in TOPICS}
 TF_FRAMES = set()
+TF_LAST = {}  # child -> (parent, xyz, quat xyzw)
 
 
 def make_cb(topic):
@@ -95,6 +96,8 @@ def make_cb(topic):
         if topic == "/tf":
             for t in msg.transforms:
                 TF_FRAMES.add((t.header.frame_id, t.child_frame_id))
+                tr, q = t.transform.translation, t.transform.rotation
+                TF_LAST[t.child_frame_id] = (t.header.frame_id, (tr.x, tr.y, tr.z), (q.x, q.y, q.z, q.w))
     return cb
 
 
@@ -223,6 +226,79 @@ motion_phase("strafe left 0.2 m/s", twist(vy=0.2), (0.0, 0.2, 0.0))
 motion_phase("rotate 1.0 rad/s", twist(wz=1.0), (0.0, 0.0, 1.0))
 motion_phase("diagonal 0.15/0.15", twist(vx=0.15, vy=-0.15), (0.15, -0.15, 0.0))
 
+# --- TF correctness: compose /tf down to end_effector_link and compare with URDF forward kinematics -----------
+import xml.etree.ElementTree as ET
+
+
+def _R(q):  # quaternion xyzw -> 3x3
+    x, y, z, w = q
+    return np.array([[1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)],
+                     [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
+                     [2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)]])
+
+
+def _T(R, t):
+    m = np.eye(4)
+    m[:3, :3], m[:3, 3] = R, t
+    return m
+
+
+def _rpy(r, p, y):
+    cr, sr, cp, sp, cy, sy = math.cos(r), math.sin(r), math.cos(p), math.sin(p), math.cos(y), math.sin(y)
+    return np.array([[cy * cp, cy * sp * sr - sy * cr, cy * sp * cr + sy * sr],
+                     [sy * cp, sy * sp * sr + cy * cr, sy * sp * cr - cy * sr], [-sp, cp * sr, cp * cr]])
+
+
+def _axis(a, q):
+    a = np.asarray(a) / np.linalg.norm(a)
+    K = np.array([[0, -a[2], a[1]], [a[2], 0, -a[0]], [-a[1], a[0], 0]])
+    return np.eye(3) + math.sin(q) * K + (1 - math.cos(q)) * K @ K
+
+
+URDF_J = {}
+for j in ET.parse(os.path.join(REPO, "description", "urdf", "rosorin_pro_sim.urdf")).getroot().findall("joint"):
+    o, a = j.find("origin"), j.find("axis")
+    URDF_J[j.find("child").get("link")] = (j.get("name"), j.find("parent").get("link"),
+                                           [float(v) for v in o.get("xyz").split()], [float(v) for v in o.get("rpy").split()],
+                                           [float(v) for v in a.get("xyz").split()] if a is not None else None)
+
+
+def urdf_fk(link, q):
+    m = np.eye(4)
+    while link in URDF_J:
+        name, parent, xyz, rpy, ax = URDF_J[link]
+        A = _T(_rpy(*rpy), xyz)
+        if ax is not None:
+            A = A @ _T(_axis(ax, q.get(name, 0.0)), [0, 0, 0])
+        m = A @ m
+        link = parent
+    return m
+
+
+def tf_chain(link):
+    m = np.eye(4)
+    chain = []
+    while link in TF_LAST and link != "base_footprint":
+        parent, t, q = TF_LAST[link]
+        m = _T(_R(q), t) @ m
+        chain.append(link)
+        link = parent
+    return m, list(reversed(chain)), link
+
+
+def check_tf(label):
+    js_ = LAST.get("/joint_states")
+    q = dict(zip(js_.name, js_.position))
+    worst = 0.0
+    for link in ("end_effector_link", "depth_cam_frame", "lidar_frame", "l_out_link"):
+        m_tf, chain, root = tf_chain(link)
+        m_fk = urdf_fk(link, q)
+        worst = max(worst, float(np.linalg.norm(m_tf[:3, 3] - m_fk[:3, 3])))
+    m_tf, chain, root = tf_chain("end_effector_link")
+    check("/tf values match URDF forward kinematics (%s)" % label, worst < 0.005 and root == "base_footprint",
+          "max position error %.4f m; chain %s -> %s" % (worst, root, " -> ".join(chain)))
+
+
 # --- 2. arm + gripper through /joint_command -----------------------------------------------------------------
 target = {"joint1": 0.5, "joint2": -0.6, "joint3": 0.8, "joint4": 0.6, "joint5": -0.4, "r_joint": 0.5}
 js = JointState()
@@ -239,6 +315,7 @@ check("arm + gripper follow /joint_command", err < 0.05, "max error %.4f rad" % 
 mimic_expect = {"l_joint": 1, "l_in_joint": -1, "l_out_joint": 1, "r_in_joint": 1, "r_out_joint": -1}
 merr = max(abs(got[k] - m * got["r_joint"]) for k, m in mimic_expect.items())
 check("gripper mimic joints follow r_joint (4-bar linkage)", merr < 0.03, "max error %.4f rad" % merr)
+check_tf("arm in the test pose")
 # back to the init pose
 js.position = [float(init[k]) for k in target]
 for _ in range(5):
@@ -307,9 +384,11 @@ if jsm:
 need_tf = {("base_footprint", "base_link"), ("odom", "base_footprint")}
 child_frames = {c for _, c in TF_FRAMES}
 RESULTS["tf_pairs"] = sorted("%s -> %s" % p for p in TF_FRAMES)
-check("/tf has odom->base_footprint and the robot frames",
-      ("odom", "base_footprint") in TF_FRAMES and {"base_link", "lidar_frame", "imu_link", "link5", "depth_cam_frame"} <= child_frames,
-      "%d pairs" % len(TF_FRAMES))
+need_pairs = {("odom", "base_footprint"), ("base_footprint", "base_link"), ("base_link", "lidar_frame"),
+              ("base_link", "imu_link"), ("base_link", "link1"), ("link4", "link5"), ("link4", "camera_link0"),
+              ("camera_link", "depth_cam_frame"), ("link5", "end_effector_link"), ("l_in_link", "l_out_link")}
+check("/tf has the URDF tree (odom -> base_footprint -> base_link -> ... like robot_state_publisher)",
+      need_pairs <= TF_FRAMES, "%d pairs, missing %s" % (len(TF_FRAMES), sorted(need_pairs - TF_FRAMES)))
 
 # --- 4. snapshots for the docs ---------------------------------------------------------------------------
 try:

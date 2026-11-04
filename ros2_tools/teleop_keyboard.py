@@ -6,8 +6,9 @@
     w / s     forward / backward          a / d   strafe left / right (mecanum)
     q / e     turn left / right           x or space  stop
     + / -     faster / slower             o / c   gripper open / close
-    1         arm init pose (camera looks ahead/down)       2  arm reach forward (pick)
-    3         arm straight up (URDF zero)                   Esc / Ctrl+C  quit
+    1         arm init pose (camera looks ahead/down)       2  pre-grasp (gripper down, 7 cm up)
+    4         grasp pose (fingertips at the floor, 0.22 m ahead)   3  arm straight up (URDF zero)
+    Esc / Ctrl+C  quit
 
 Publishes geometry_msgs/Twist on /cmd_vel (10 Hz while moving) and sensor_msgs/JointState on /joint_command.
 """
@@ -21,7 +22,8 @@ from sensor_msgs.msg import JointState
 
 POSES = {
     "1": {"joint1": 0.0, "joint2": 0.0, "joint3": 1.5708, "joint4": 0.7854, "joint5": 0.0},
-    "2": {"joint1": 0.0, "joint2": 1.8326, "joint3": 0.0, "joint4": 0.9948, "joint5": 0.0},
+    "2": {"joint1": 0.0, "joint2": 1.4399, "joint3": 0.2967, "joint4": 1.3614, "joint5": 0.0},   # pre-grasp
+    "4": {"joint1": 0.0, "joint2": 2.0246, "joint3": 0.0, "joint4": 0.9599, "joint5": 0.0},      # grasp (floor)
     "3": {"joint1": 0.0, "joint2": 0.0, "joint3": 0.0, "joint4": 0.0, "joint5": 0.0},
 }
 GRIPPER = {"o": 0.9, "c": -0.65}  # r_joint [rad]: + opens (58 mm max), fingers touch at -0.65

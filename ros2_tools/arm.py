@@ -1,9 +1,12 @@
 """Command the ROSOrin Pro arm and gripper through /joint_command (sensor_msgs/JointState).
 
-    ros2_tools\\run.bat ros2_tools\\arm.py pose init          named pose: init | pick | up
+    ros2_tools\\run.bat ros2_tools\\arm.py pose init          named pose: init | pregrasp | pick | up
     ros2_tools\\run.bat ros2_tools\\arm.py joints 0 -0.5 1.6 0.9 0     joint1..joint5 [rad]
     ros2_tools\\run.bat ros2_tools\\arm.py gripper open       open | close | <r_joint rad>
     ros2_tools\\run.bat ros2_tools\\arm.py state              print the current /joint_states (arm + gripper)
+
+Pick-up recipe (3 cm block centred 0.222 m in front of base_footprint): gripper open -> pose pregrasp ->
+pose pick -> gripper close -> pose pregrasp (lift). tests/test_pick.py does exactly this.
 
 Joint limits (HX-12H bus servos, 0-240 deg): joint1..5 +-2.09 rad. Gripper r_joint: +0.9 = open (58 mm),
 -0.65 = closed (fingers touch); the other five gripper joints are mimics of r_joint (4-bar linkage).
@@ -17,7 +20,8 @@ from sensor_msgs.msg import JointState
 
 POSES = {
     "init": [0.0, 0.0, 1.5708, 0.7854, 0.0],   # like the real robot's /init_pose: camera looks ahead and down
-    "pick": [0.0, 1.8326, 0.0, 0.9948, 0.0],    # top-down grasp 0.25 m in front of base_footprint, 4 cm high (FK)
+    "pregrasp": [0.0, 1.4399, 0.2967, 1.3614, 0.0],  # gripper pointing down, 7 cm above the pick point (FK)
+    "pick": [0.0, 2.0246, 0.0, 0.9599, 0.0],     # fingertips 6 mm above the floor, 0.222 m in front of base_footprint
     "up": [0.0, 0.0, 0.0, 0.0, 0.0],            # URDF zero pose, arm straight up
 }
 ARM = ["joint1", "joint2", "joint3", "joint4", "joint5"]

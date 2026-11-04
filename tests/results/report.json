@@ -51,6 +51,11 @@
       "detail": "max error 0.0000 rad"
     },
     {
+      "check": "/tf values match URDF forward kinematics (arm in the test pose)",
+      "pass": true,
+      "detail": "max position error 0.0000 m; chain base_footprint -> base_link -> link1 -> link2 -> link3 -> link4 -> link5 -> end_effector_link"
+    },
+    {
       "check": "topic /clock",
       "pass": true,
       "detail": "1676 msgs, 60.0 Hz sim time"
@@ -166,9 +171,9 @@
       "detail": "51 joints"
     },
     {
-      "check": "/tf has odom->base_footprint and the robot frames",
+      "check": "/tf has the URDF tree (odom -> base_footprint -> base_link -> ... like robot_state_publisher)",
       "pass": true,
-      "detail": "24 pairs"
+      "detail": "24 pairs, missing []"
     }
   ],
   "topics": {
@@ -395,32 +400,32 @@
   },
   "tf_pairs": [
     "base_footprint -> base_link",
-    "base_footprint -> camera_link",
-    "base_footprint -> camera_link0",
-    "base_footprint -> depth_cam_frame",
-    "base_footprint -> end_effector_link",
-    "base_footprint -> gripper_link",
-    "base_footprint -> imu_link",
-    "base_footprint -> l_in_link",
-    "base_footprint -> l_link",
-    "base_footprint -> l_out_link",
-    "base_footprint -> left_back_wheel_link",
-    "base_footprint -> left_front_wheel_link",
-    "base_footprint -> lidar_frame",
-    "base_footprint -> link1",
-    "base_footprint -> link2",
-    "base_footprint -> link3",
-    "base_footprint -> link4",
-    "base_footprint -> link5",
-    "base_footprint -> r_in_link",
-    "base_footprint -> r_link",
-    "base_footprint -> r_out_link",
-    "base_footprint -> right_back_wheel_link",
-    "base_footprint -> right_front_wheel_link",
-    "odom -> base_footprint"
+    "base_link -> imu_link",
+    "base_link -> left_back_wheel_link",
+    "base_link -> left_front_wheel_link",
+    "base_link -> lidar_frame",
+    "base_link -> link1",
+    "base_link -> right_back_wheel_link",
+    "base_link -> right_front_wheel_link",
+    "camera_link -> depth_cam_frame",
+    "camera_link0 -> camera_link",
+    "gripper_link -> l_in_link",
+    "gripper_link -> l_link",
+    "gripper_link -> r_in_link",
+    "gripper_link -> r_link",
+    "l_in_link -> l_out_link",
+    "link1 -> link2",
+    "link2 -> link3",
+    "link3 -> link4",
+    "link4 -> camera_link0",
+    "link4 -> link5",
+    "link5 -> end_effector_link",
+    "link5 -> gripper_link",
+    "odom -> base_footprint",
+    "r_in_link -> r_out_link"
   ],
   "summary": {
-    "passed": 34,
+    "passed": 35,
     "failed": 0
   }
 }

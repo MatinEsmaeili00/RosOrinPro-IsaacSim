@@ -456,15 +456,24 @@ def main():
             str(gscope.AppendChild("MecanumDrive")), art_root, wheel_names, IK,
             cmd_topics=["cmd_vel", "controller/cmd_vel", "app/cmd_vel"])
         ros_graphs.build_arm_graph(str(gscope.AppendChild("ArmGripper")), art_root, "joint_command")
-        tf_targets = [str(FRAMES[f].GetPath()) for f in ("base_link", "lidar_frame", "imu_link", "camera_link0",
-                                                         "camera_link", "depth_cam_frame", "gripper_link",
-                                                         "end_effector_link")]
-        tf_targets += [str(BODIES[b].GetPath()) for b in ("link1", "link2", "link3", "link4", "link5", "l_link",
-                                                           "r_link", "l_in_link", "r_in_link", "l_out_link",
-                                                           "r_out_link", "left_front_wheel_link", "left_back_wheel_link",
-                                                           "right_front_wheel_link", "right_back_wheel_link")]
+        # /tf with the URDF's parent/child structure (what robot_state_publisher publishes on the real robot)
+        P = {**{k: str(v.GetPath()) for k, v in BODIES.items()}, **{k: str(v.GetPath()) for k, v in FRAMES.items()}}
+        tf_tree = [
+            ("base_footprint", ["base_link"]),
+            ("base_link", ["lidar_frame", "imu_link", "link1", "left_front_wheel_link", "left_back_wheel_link",
+                           "right_front_wheel_link", "right_back_wheel_link"]),
+            ("link1", ["link2"]), ("link2", ["link3"]), ("link3", ["link4"]),
+            ("link4", ["camera_link0", "link5"]), ("camera_link0", ["camera_link"]), ("camera_link", ["depth_cam_frame"]),
+            ("link5", ["gripper_link", "end_effector_link"]),
+            ("gripper_link", ["l_link", "r_link", "l_in_link", "r_in_link"]),
+            ("l_in_link", ["l_out_link"]), ("r_in_link", ["r_out_link"]),
+        ]
+        for parent, kids in tf_tree:  # every pair must be a URDF joint
+            for k in kids:
+                assert JOINTS[CHILD_JOINT[k]]["parent"] == parent, (parent, k)
+        tf_groups = [(P[parent], [P[k] for k in kids]) for parent, kids in tf_tree]
         ros_graphs.build_state_graph(
-            str(gscope.AppendChild("RobotState")), art_root, art_root, "base_footprint", tf_targets,
+            str(gscope.AppendChild("RobotState")), art_root, art_root, "base_footprint", tf_groups,
             IMU_PATH, scfg["imu"]["frame_id"],
             joint_state_topics=["joint_states", "controller_manager/joint_states"],
             odom_topics=["odom", "odom_raw"],

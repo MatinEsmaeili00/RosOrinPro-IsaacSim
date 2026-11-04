@@ -135,15 +135,17 @@ def build_arm_graph(path, art_root, topic):
     return _graph(path, nodes, values, connects)
 
 
-def build_state_graph(path, art_root, chassis_prim, chassis_frame, tf_targets, imu_prim, imu_frame,
+def build_state_graph(path, art_root, chassis_prim, chassis_frame, tf_groups, imu_prim, imu_frame,
                       joint_state_topics, odom_topics, imu_topics):
-    """/joint_states, /odom (+ odom -> base_footprint TF), /tf of the robot links and frames, /imu."""
+    """/joint_states, /odom (+ odom -> base_footprint TF), /tf of the robot links and frames, /imu.
+
+    tf_groups = [(parent_prim, [child_prims])]: one transform-tree node per parent, so /tf has the same
+    parent/child structure as the URDF (robot_state_publisher on the real robot), not a flat tree.
+    """
     nodes = [TICK, CTX, SIMTIME,
              ("ReadJointState", "isaacsim.sensors.physics.IsaacReadJointState"),
              ("ComputeOdometry", "isaacsim.core.nodes.IsaacComputeOdometry"),
              ("TFOdom", "isaacsim.ros2.bridge.ROS2PublishRawTransformTree"),
-             ("ComputeTF", "isaacsim.core.nodes.IsaacComputeTransformTree"),
-             ("PublishTF", "isaacsim.ros2.bridge.ROS2PublishTransformTree"),
              ("ReadIMU", "isaacsim.sensors.physics.IsaacReadIMU")]
     values = [
         ("SimTime.inputs:resetOnStop", True),
@@ -152,30 +154,34 @@ def build_state_graph(path, art_root, chassis_prim, chassis_frame, tf_targets, i
         ("TFOdom.inputs:parentFrameId", "odom"),
         ("TFOdom.inputs:childFrameId", chassis_frame),
         ("TFOdom.inputs:topicName", "tf"),
-        ("ComputeTF.inputs:parentPrim", [Sdf.Path(chassis_prim)]),
-        ("ComputeTF.inputs:targetPrims", [Sdf.Path(p) for p in tf_targets]),
-        ("PublishTF.inputs:topicName", "tf"),
         ("ReadIMU.inputs:imuPrim", [Sdf.Path(imu_prim)]),
         ("ReadIMU.inputs:readGravity", True),
     ]
     connects = [
         ("Tick.outputs:tick", "ReadJointState.inputs:execIn"),
         ("Tick.outputs:tick", "ComputeOdometry.inputs:execIn"),
-        ("Tick.outputs:tick", "ComputeTF.inputs:execIn"),
         ("Tick.outputs:tick", "ReadIMU.inputs:execIn"),
         ("ComputeOdometry.outputs:execOut", "TFOdom.inputs:execIn"),
         ("ComputeOdometry.outputs:position", "TFOdom.inputs:translation"),
         ("ComputeOdometry.outputs:orientation", "TFOdom.inputs:rotation"),
         ("Context.outputs:context", "TFOdom.inputs:context"),
         ("SimTime.outputs:simulationTime", "TFOdom.inputs:timeStamp"),
-        ("ComputeTF.outputs:execOut", "PublishTF.inputs:execIn"),
-        ("ComputeTF.outputs:parentFrames", "PublishTF.inputs:parentFrames"),
-        ("ComputeTF.outputs:childFrames", "PublishTF.inputs:childFrames"),
-        ("ComputeTF.outputs:translations", "PublishTF.inputs:translations"),
-        ("ComputeTF.outputs:orientations", "PublishTF.inputs:orientations"),
-        ("Context.outputs:context", "PublishTF.inputs:context"),
-        ("SimTime.outputs:simulationTime", "PublishTF.inputs:timeStamp"),
     ]
+    for i, (parent, children) in enumerate(tf_groups):
+        c, pb = "ComputeTF%d" % i, "PublishTF%d" % i
+        nodes += [(c, "isaacsim.core.nodes.IsaacComputeTransformTree"),
+                  (pb, "isaacsim.ros2.bridge.ROS2PublishTransformTree")]
+        values += [(c + ".inputs:parentPrim", [Sdf.Path(parent)]),
+                   (c + ".inputs:targetPrims", [Sdf.Path(p) for p in children]),
+                   (pb + ".inputs:topicName", "tf")]
+        connects += [("Tick.outputs:tick", c + ".inputs:execIn"),
+                     (c + ".outputs:execOut", pb + ".inputs:execIn"),
+                     (c + ".outputs:parentFrames", pb + ".inputs:parentFrames"),
+                     (c + ".outputs:childFrames", pb + ".inputs:childFrames"),
+                     (c + ".outputs:translations", pb + ".inputs:translations"),
+                     (c + ".outputs:orientations", pb + ".inputs:orientations"),
+                     ("Context.outputs:context", pb + ".inputs:context"),
+                     ("SimTime.outputs:simulationTime", pb + ".inputs:timeStamp")]
     for i, topic in enumerate(joint_state_topics):
         n = "PublishJointState%d" % i
         nodes.append((n, "isaacsim.ros2.bridge.ROS2PublishJointState"))

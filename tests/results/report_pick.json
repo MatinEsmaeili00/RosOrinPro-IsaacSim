@@ -1,0 +1,31 @@
+{
+  "checks": [
+    {
+      "check": "gripper stops on the 30 mm block (does not close fully)",
+      "pass": true,
+      "detail": "r_joint=-0.231 rad (fully closed = -0.65)"
+    },
+    {
+      "check": "block lifted off the floor",
+      "pass": true,
+      "detail": "block z 0.015 -> 0.058 m"
+    },
+    {
+      "check": "block still held after moving the arm back to the init pose",
+      "pass": true,
+      "detail": "block z 0.198 m"
+    }
+  ],
+  "trace": [
+    {
+      "phase": "at grasp",
+      "block_z": 0.014999997802078724,
+      "r_joint": 0.9008346796035767
+    },
+    {
+      "phase": "lifted",
+      "block_z": 0.05763709545135498,
+      "r_joint": -0.23112285137176514
+    }
+  ]
+}
