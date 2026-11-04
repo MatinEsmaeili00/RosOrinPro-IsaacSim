@@ -1,6 +1,6 @@
-"""Performance benchmark: wall-clock time per simulated frame (1/60 s) for several configurations.
+r"""Performance benchmark: wall-clock time per simulated frame (1/60 s) for several configurations.
 
-    launch\\run_python.bat tests\\bench_perf.py
+    launch\run_python.bat tests\bench_perf.py
 Real-time factor = (1/60) / wall time per frame.
 """
 

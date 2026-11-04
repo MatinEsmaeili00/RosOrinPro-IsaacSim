@@ -1,4 +1,4 @@
-"""Render documentation images: robot overview shots + what the robot's sensors see.
+r"""Render documentation images: robot overview shots + what the robot's sensors see.
 
     launch\run_python.bat tools\render_docs.py [--out docs\images]
 """

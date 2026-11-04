@@ -19,6 +19,11 @@
       "check": "battery: plausible 3S voltage that drains",
       "pass": true,
       "detail": "[12269] -> [11444] mV"
+    },
+    {
+      "check": "/robot_description (latched URDF) received",
+      "pass": true,
+      "detail": "65444 chars, 59 joints"
     }
   ]
 }

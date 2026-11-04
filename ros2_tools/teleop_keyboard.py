@@ -1,6 +1,6 @@
-"""Keyboard teleop for the ROSOrin Pro (simulated or real): mecanum base, arm presets and gripper.
+r"""Keyboard teleop for the ROSOrin Pro (simulated or real): mecanum base, arm presets and gripper.
 
-    ros2_tools\\run.bat ros2_tools\\teleop_keyboard.py          (Windows, Isaac Sim's bundled ROS 2)
+    ros2_tools\run.bat ros2_tools\teleop_keyboard.py          (Windows, Isaac Sim's bundled ROS 2)
     python3 ros2_tools/teleop_keyboard.py                     (Linux with ROS 2 sourced)
 
     w / s     forward / backward          a / d   strafe left / right (mecanum)

@@ -1,6 +1,6 @@
-"""Headless end-to-end test of the ROSOrin Pro simulation through its ROS 2 interface.
+r"""Headless end-to-end test of the ROSOrin Pro simulation through its ROS 2 interface.
 
-    launch\\run_tests.bat            (sets the ROS 2 Humble/FastDDS environment and runs this file)
+    launch\run_tests.bat            (sets the ROS 2 Humble/FastDDS environment and runs this file)
 
 Drives the robot exactly like a ROS 2 user would (/cmd_vel, /joint_command), checks the motion against
 the physics ground truth and /odom, listens to every sensor topic of the real robot, and writes
@@ -399,8 +399,9 @@ try:
         PILImage.fromarray(a).save(os.path.join(args.out, "camera_rgb.png"))
     if dep:
         dd = np.nan_to_num(d, nan=0.0, posinf=0.0)
-        v = np.clip(dd / 3.0, 0, 1)
-        col = (np.stack([v, v ** 0.5, 1 - v], -1) * 255 * (dd[..., None] > 0)).astype(np.uint8)
+        lo, hi = (float(dd[dd > 0].min()), float(dd[dd > 0].max())) if (dd > 0).any() else (0.15, 3.0)
+        v = np.clip((dd - lo) / max(hi - lo, 1e-3), 0, 1)   # near = blue, far = red
+        col = (np.stack([v, 1 - np.abs(2 * v - 1), 1 - v], -1) * 255 * (dd[..., None] > 0)).astype(np.uint8)
         PILImage.fromarray(col).save(os.path.join(args.out, "camera_depth.png"))
     ir = LAST.get("/depth_cam/iro/image_raw")
     if ir:

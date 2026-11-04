@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>rosorin_pro_sim_description</name>
+  <version>1.0.0</version>
+  <description>
+    Simulation URDF of the Hiwonder ROSOrin Pro used by the Isaac Sim digital twin (RosOrinPro-IsaacSim):
+    Hiwonder rosorin_description (Mecanum Pro, SCLIDAR/COIN-D6) + split mecanum wheels and rollers,
+    realistic masses and servo/motor limits. Install it on the ROS side so RViz / MoveIt can resolve the
+    package:// mesh paths of /robot_description published by the simulator.
+  </description>
+  <maintainer email="mn.matinesmaeili@gmail.com">Matin Esmaeili</maintainer>
+  <license>Proprietary (meshes: Hiwonder rosorin_description, license not declared)</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

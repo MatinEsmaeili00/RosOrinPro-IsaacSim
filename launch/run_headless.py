@@ -1,4 +1,4 @@
-"""Run the ROSOrin Pro simulation without a window (e.g. as a ROS 2 'robot' for Nav2/SLAM on this PC).
+r"""Run the ROSOrin Pro simulation without a window (e.g. as a ROS 2 'robot' for Nav2/SLAM on this PC).
 
     launch\run_headless.bat [--scene PATH] [--twin-domain N] [--twin-ns NS] [--duration SEC] [--no-cameras]
 """

@@ -1,6 +1,6 @@
-"""Grasp test: the simulated ROSOrin Pro picks up a 3 cm block using only /joint_command (like a ROS user).
+r"""Grasp test: the simulated ROSOrin Pro picks up a 3 cm block using only /joint_command (like a ROS user).
 
-    launch\\run_python.bat tests\\test_pick.py
+    launch\run_python.bat tests\test_pick.py
 Sequence: open gripper -> pre-grasp -> descend (joint interpolation) -> close -> lift. Checks that the block is
 lifted and that the fingers stop on the block (r_joint stays above the fully-closed value).
 """

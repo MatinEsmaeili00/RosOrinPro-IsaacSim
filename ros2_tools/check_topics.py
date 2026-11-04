@@ -1,6 +1,6 @@
-"""Check that the ROSOrin Pro topics are alive (simulation or real robot): rate, frame and a short summary.
+r"""Check that the ROSOrin Pro topics are alive (simulation or real robot): rate, frame and a short summary.
 
-    ros2_tools\\run.bat ros2_tools\\check_topics.py [seconds]
+    ros2_tools\run.bat ros2_tools\check_topics.py [seconds]
 """
 
 import math

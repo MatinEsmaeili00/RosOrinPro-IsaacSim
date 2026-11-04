@@ -3,6 +3,8 @@
   * Battery   /ros_robot_controller/battery  std_msgs/UInt16 [mV], like the robot's STM32 board.
               3S 6000 mAh pack: 12.6 V full -> 9.9 V empty, discharged by an idle load + the motor load,
               with voltage sag under load. Warns below 10.0 V like the real buzzer.
+  * /robot_description  the simulation URDF (std_msgs/String, transient-local like robot_state_publisher), so
+              RViz / MoveIt on the ROS side get the model (mesh URIs: package://rosorin_pro_sim_description).
   * Twin mode Digital-twin mirror of the REAL robot: subscribes to the robot's /joint_states and /odom on the
               robot's ROS domain (a separate DDS participant, so the sim's own topics never collide with the
               robot's) and makes the simulated arm, gripper and base follow it. The simulated sensors keep
@@ -109,12 +111,23 @@ class RosOrinRuntime:
             self._sim_node = rclpy.create_node("rosorin_sim_runtime", context=self._sim_ctx)
             self._bat_pub = self._sim_node.create_publisher(UInt16, "ros_robot_controller/battery", 10)
             self._UInt16 = UInt16
+            self._publish_robot_description()
         if self.twin_domain is not None:
             self._start_twin()
         self._subs.append(SimulationManager.register_callback(self._on_step, event=SimulationEvent.PHYSICS_POST_STEP))
         self._subs.append(SimulationManager.register_callback(lambda *_: self._reset_state(),
                                                               event=SimulationEvent.SIMULATION_STOPPED))
         self.log("[rosorin] runtime started: battery=%s twin_domain=%s" % (self.battery_enabled, self.twin_domain))
+
+    def _publish_robot_description(self):
+        from rclpy.qos import DurabilityPolicy, QoSProfile
+        from std_msgs.msg import String
+
+        urdf = os.path.join(REPO, "description", "urdf", "rosorin_pro_sim.urdf")
+        qos = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
+        self._desc_pub = self._sim_node.create_publisher(String, "robot_description", qos)
+        with open(urdf, "r", encoding="utf-8") as f:
+            self._desc_pub.publish(String(data=f.read()))
 
     def _start_twin(self):
         rclpy = self._rclpy

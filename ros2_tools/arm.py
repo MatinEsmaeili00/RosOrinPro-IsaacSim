@@ -1,9 +1,9 @@
-"""Command the ROSOrin Pro arm and gripper through /joint_command (sensor_msgs/JointState).
+r"""Command the ROSOrin Pro arm and gripper through /joint_command (sensor_msgs/JointState).
 
-    ros2_tools\\run.bat ros2_tools\\arm.py pose init          named pose: init | pregrasp | pick | up
-    ros2_tools\\run.bat ros2_tools\\arm.py joints 0 -0.5 1.6 0.9 0     joint1..joint5 [rad]
-    ros2_tools\\run.bat ros2_tools\\arm.py gripper open       open | close | <r_joint rad>
-    ros2_tools\\run.bat ros2_tools\\arm.py state              print the current /joint_states (arm + gripper)
+    ros2_tools\run.bat ros2_tools\arm.py pose init          named pose: init | pregrasp | pick | up
+    ros2_tools\run.bat ros2_tools\arm.py joints 0 -0.5 1.6 0.9 0     joint1..joint5 [rad]
+    ros2_tools\run.bat ros2_tools\arm.py gripper open       open | close | <r_joint rad>
+    ros2_tools\run.bat ros2_tools\arm.py state              print the current /joint_states (arm + gripper)
 
 Pick-up recipe (3 cm block centred 0.222 m in front of base_footprint): gripper open -> pose pregrasp ->
 pose pick -> gripper close -> pose pregrasp (lift). tests/test_pick.py does exactly this.

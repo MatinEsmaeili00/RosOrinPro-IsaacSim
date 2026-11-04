@@ -1,10 +1,10 @@
-"""Test of the Python runtime: battery topic + digital-twin mode.
+r"""Test of the Python runtime: battery topic + digital-twin mode.
 
 A fake "real robot" publishes /joint_states and /odom (driving a circle) on ROS domain 42. The simulation runs in
 twin mode following domain 42, while a checker on the simulation's own domain (ROS_DOMAIN_ID, default 0) verifies
 that the simulated robot's /joint_states and /odom follow the fake robot and that /ros_robot_controller/battery
 is published.
-    launch\\run_python.bat tests\\test_twin_battery.py
+    launch\run_python.bat tests\test_twin_battery.py
 """
 
 import json
@@ -77,6 +77,11 @@ BAT = []
 chk.create_subscription(JointState, "joint_states", lambda m: LAST.__setitem__("js", m), qos_profile_sensor_data)
 chk.create_subscription(Odometry, "odom", lambda m: LAST.__setitem__("odom", m), qos_profile_sensor_data)
 chk.create_subscription(UInt16, "ros_robot_controller/battery", lambda m: BAT.append(m.data), qos_profile_sensor_data)
+from rclpy.qos import DurabilityPolicy, QoSProfile
+from std_msgs.msg import String
+
+chk.create_subscription(String, "robot_description", lambda m: LAST.__setitem__("desc", m.data),
+                        QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL))
 ex = SingleThreadedExecutor()
 ex.add_node(chk)
 
@@ -135,6 +140,9 @@ if od:
 check("battery: /ros_robot_controller/battery (UInt16 mV) at ~1 Hz", 6 <= len(BAT) <= 9, "%d msgs: %s" % (len(BAT), BAT))
 check("battery: plausible 3S voltage that drains", len(BAT) >= 2 and 9900 <= BAT[-1] <= 12600 and BAT[-1] < BAT[0],
       "%s -> %s mV" % (BAT[:1], BAT[-1:]))
+desc = LAST.get("desc", "")
+check("/robot_description (latched URDF) received", '<robot name="rosorin_pro"' in desc and desc.count("<joint") == 59,
+      "%d chars, %d joints" % (len(desc), desc.count("<joint")))
 tl.stop()
 app.update()
 rt.stop()

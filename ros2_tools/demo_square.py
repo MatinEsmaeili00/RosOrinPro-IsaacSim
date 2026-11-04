@@ -1,7 +1,7 @@
-"""Mecanum demo: drive a 0.6 m square WITHOUT turning (forward, strafe left, backward, strafe right), then
+r"""Mecanum demo: drive a 0.6 m square WITHOUT turning (forward, strafe left, backward, strafe right), then
 spin 360 deg, closing the loop on /odom. Works on the simulation and on the real robot (use a clear floor!).
 
-    ros2_tools\\run.bat ros2_tools\\demo_square.py [side_m] [speed_mps]
+    ros2_tools\run.bat ros2_tools\demo_square.py [side_m] [speed_mps]
 """
 
 import math

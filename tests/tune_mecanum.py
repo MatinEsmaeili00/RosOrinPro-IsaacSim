@@ -1,9 +1,9 @@
-"""Mecanum physics tuning sweep (documented in docs/DECISIONS.md, "Mecanum physics").
+r"""Mecanum physics tuning sweep (documented in docs/DECISIONS.md, "Mecanum physics").
 
 Runs the robot with exact mecanum inverse kinematics on the wheel joints (no ROS) for several physics
 parameter sets and reports how well forward / strafe / rotate commands are tracked (mean and noise of
 the body velocity). Usage:
-    launch\\run_python.bat tests\\tune_mecanum.py [--variants A,B,...]
+    launch\run_python.bat tests\tune_mecanum.py [--variants A,B,...]
 """
 
 import argparse
