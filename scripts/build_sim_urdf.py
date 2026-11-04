@@ -186,7 +186,8 @@ def build(cfg_path, lidar_override=None):
     out_mesh_dir = os.path.join(REPO, dcfg["output_meshes"])
     pkg_name = dcfg["package_name"]
     lidar_variant = lidar_override or dcfg["lidar_variant"]
-    report = {"source_package": pkg_dir, "resolved_urdf": resolved, "lidar_variant": lidar_variant}
+    report = {"source_package": os.path.relpath(pkg_dir, REPO).replace("\\", "/"),
+              "resolved_urdf": os.path.relpath(resolved, REPO).replace("\\", "/"), "lidar_variant": lidar_variant}
 
     def uri(rel):
         return "package://%s/meshes/%s" % (pkg_name, rel.replace("\\", "/"))

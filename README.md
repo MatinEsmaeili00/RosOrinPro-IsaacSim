@@ -13,9 +13,12 @@ unchanged against the simulator. It can also act as a **digital twin** that foll
 
 Built from Hiwonder's `rosorin_description` package and the model in
 [RosOrinProMesh](https://github.com/MatinEsmaeili00/RosOrinProMesh). The feature list follows
-[Robot-ROSOrin-Pro](https://github.com/MatinEsmaeili00/Robot-ROSOrin-Pro).
+[Robot-ROSOrin-Pro](https://github.com/MatinEsmaeili00/Robot-ROSOrin-Pro). All inputs are copied into
+[`sources/`](sources/README.md), and every specification and reference is listed in
+[docs/SOURCES.md](docs/SOURCES.md).
 Everything was built and verified headless on this PC (Windows 11, RTX A6000, Isaac Sim 6.2.0).
-[docs/WORKLOG.md](docs/WORKLOG.md) records every step.
+[docs/WORKLOG.md](docs/WORKLOG.md) records every step, and [docs/TESTING.md](docs/TESTING.md) shows how to
+check that it works.
 
 ## Highlights
 
@@ -53,9 +56,13 @@ launch\run_isaacsim.bat
 :: 2. In a second terminal, drive it (w/s/a/d/q/e, x = stop, o/c = gripper, 1-4 = arm poses)
 ros2_tools\run.bat ros2_tools\teleop_keyboard.py
 
-:: 3. Check that every topic of the real robot is alive
+:: 3. Check that every topic of the real robot is alive, and take pictures of the camera, depth and lidar
 ros2_tools\run.bat ros2_tools\check_topics.py
+ros2_tools\run.bat ros2_tools\sensor_snapshot.py
 ```
+
+**Is it working?** [docs/TESTING.md](docs/TESTING.md) walks through five basic checks with the expected output
+for each one.
 
 Other entry points:
 
@@ -64,6 +71,7 @@ Other entry points:
 | `launch\run_headless.bat` | Simulation without a window (`--no-cameras`, `--duration S`, `--twin-domain N`) |
 | `ros2_tools\run.bat ros2_tools\arm.py pose init\|pregrasp\|pick\|up` | Named arm poses (`joints q1 .. q5`, `gripper open\|close`, `state`) |
 | `ros2_tools\run.bat ros2_tools\demo_square.py` | Drives a 0.5 m square without turning (strafing), then spins 360°, closing the loop on `/odom` |
+| `ros2_tools\run.bat ros2_tools\sensor_snapshot.py` | One message per sensor: PASS/FAIL checks and `snapshots\rgb.png`, `depth.png`, `scan.png` (also on the real robot) |
 | `launch\run_tests.bat` | End-to-end ROS 2 test (35 checks) |
 | `launch\build_all.bat` | Rebuild URDF → USD → robot asset → scenes from the Hiwonder package |
 
@@ -135,6 +143,7 @@ circle: base error 4 mm and 0.014 rad, arm error 0.018 rad.
 
 ```
 config/rosorin_pro_sim.yaml   all parameters: masses, drives, sensors, physics, battery, init pose
+sources/                      the inputs, unchanged: Hiwonder rosorin_description, RosOrinProMesh URDF, feature list
 description/                  simulation URDF + meshes (ROS 2 package rosorin_pro_sim_description)
 usd/rosorin_pro.usd           THE ROBOT: physics, sensors, ROS 2 graphs (self-contained, reference it anywhere)
 scenes/                       rosorin_world.usd (robot + arena), test_arena.usd, backup of the original scene
@@ -143,7 +152,7 @@ launch/                       Isaac Sim launchers, ROS env, runtime (battery, tw
 ros2_tools/                   teleop, arm CLI, topic checker, demo (bundled rclpy, also work on Linux)
 tests/                        end-to-end, grasp, twin/battery, mecanum tuning sweeps, performance benchmark
 tools/render_docs.py          renders the images in docs/images
-docs/                         WORKLOG, DECISIONS, ARCHITECTURE, ROS2_INTERFACE
+docs/                         TESTING, SOURCES, WORKLOG, DECISIONS, ARCHITECTURE, ROS2_INTERFACE
 ```
 
 Your scene `C:\isaac-sim-standalone-6.2.0\RosOrin_Claude.usd` references `./RosOrinPro-IsaacSim/usd/rosorin_pro.usd`
@@ -156,8 +165,8 @@ want it. The original scene is backed up in `scenes/RosOrin_Claude.original.usda
 launch\build_all.bat
 ```
 
-1. `scripts/build_sim_urdf.py` builds `description/urdf/rosorin_pro_sim.urdf`. It splits the wheels and
-   rollers out of `base_link.stl` and applies masses and limits from the config.
+1. `scripts/build_sim_urdf.py` builds `description/urdf/rosorin_pro_sim.urdf` from the inputs in `sources/`.
+   It splits the wheels and rollers out of `base_link.stl` and applies masses and limits from the config.
 2. `scripts/import_to_usd.py` runs the Isaac Sim URDF importer (`usd/rosorin_pro/`, not committed).
 3. `scripts/configure_robot.py` writes `usd/rosorin_pro.usd`. It adds frames, drives, mimic joints,
    colliders, materials, sensors and graphs, and verifies everything against URDF forward kinematics.
@@ -177,6 +186,7 @@ To change the lidar variant: `python.bat scripts\build_sim_urdf.py --lidar MS200
 | Cross-process (separate ROS 2 programs): `check_topics.py` 18/18 topics, `demo_square.py` loop error 8 mm and 1° | ✅ |
 
 Results are in `tests/results/`. Tuning and benchmark data are explained in [docs/DECISIONS.md](docs/DECISIONS.md).
+How to run each check yourself, with the expected output: [docs/TESTING.md](docs/TESTING.md).
 
 ## Known differences from the real robot
 
@@ -188,9 +198,14 @@ Results are in `tests/results/`. Tuning and benchmark data are explained in [doc
 * Hiwonder's custom-message topics (servo controller, RGB, buzzer, OLED, buttons) are not simulated.
 * Link masses are estimates (total 3.6 kg as specified), because the CAD masses in the URDF are unrealistic.
   See [docs/DECISIONS.md](docs/DECISIONS.md).
+* About 150 of the 400 lidar beams hit the robot's own chassis. The URDF's lidar frame sits on top of the
+  lidar housing, and at that height the beam grazes the chassis. The real beam height is still to be checked
+  against a real scan (see the open items in [docs/WORKLOG.md](docs/WORKLOG.md)).
 
 ## Documentation
 
+* [docs/TESTING.md](docs/TESTING.md): how to check that it works, step by step, with expected output.
+* [docs/SOURCES.md](docs/SOURCES.md): every source: input files, robot specifications with links, Isaac Sim references.
 * [docs/WORKLOG.md](docs/WORKLOG.md): what was done, in order, including the problems found and how they were fixed.
 * [docs/DECISIONS.md](docs/DECISIONS.md): every engineering decision with its data (lidar variant, masses,
   rollers, contact tuning, IK, init pose, gripper, cameras, performance, TF, twin mode).
@@ -199,6 +214,7 @@ Results are in `tests/results/`. Tuning and benchmark data are explained in [doc
 
 ## License and credits
 
-The robot description and meshes come from Hiwonder's `rosorin_description` package, whose license is not
-declared (`package.xml`: "TODO"). That is why this repository is **private**. Ask Hiwonder before publishing
-it. The scripts, configuration and documentation are by Matin Esmaeili, built with Claude Code.
+The robot description and meshes come from Hiwonder's `rosorin_description` package (in `sources/`, upstream
+[Hiwonder/ROSOrin-Pro](https://github.com/Hiwonder/ROSOrin-Pro)). Neither the package (`package.xml`: "TODO")
+nor the upstream repository declares a license. That is why this repository is **private**. Ask Hiwonder
+before publishing it. The scripts, configuration and documentation are by Matin Esmaeili, built with Claude Code.

@@ -7,3 +7,6 @@
 *.stl binary
 *.usd binary
 *.png binary
+*.jpg binary
+# vendored inputs: keep byte-identical to the originals (no line-ending conversion)
+sources/** -text

@@ -6,3 +6,6 @@ __pycache__/
 # Isaac Sim / Kit caches and logs
 *.log
 .thumbs/
+
+# sensor_snapshot.py output
+snapshots/

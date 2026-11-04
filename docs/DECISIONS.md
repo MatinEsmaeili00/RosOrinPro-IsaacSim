@@ -140,6 +140,13 @@ on a 30 mm block at about −0.2 rad.
   while RGB was throttled. Using `omni:sensor:tickRate = 15` on the camera prims gives 15 Hz on every stream.
 * **Depth registration:** RGB and depth share one optical frame (depth registered to color). The real module
   has a 40 mm stereo baseline.
+* **Lidar beam height (open):** the emitter sits at the `lidar_frame` origin, which Hiwonder's URDF puts
+  on the top face of the lidar housing (housing z 0.097–0.132 m above `base_footprint`). At that height the
+  beam grazes the chassis, and about 150 of 400 beams return nothing in the test arena (back corners and about
+  ±55° to the front). A ray cast of the URDF meshes at lower beam heights gives 265 blocked beams at the top
+  face, 162 at 8 mm below it, 106 at 12 mm and 64–69 at 16–24 mm. The remaining 64–69 are the structure
+  behind the lidar. The real optical height is not published, so the URDF frame was kept. A `/scan` recorded
+  on the real robot will show which sectors it really loses.
 * **IR:** Isaac has no IR rendering. `/depth_cam/iro/image_raw` is the rendering of the depth camera, whose
   clipping limits it to 0.15–3 m, much like an active-IR image fading with distance.
 

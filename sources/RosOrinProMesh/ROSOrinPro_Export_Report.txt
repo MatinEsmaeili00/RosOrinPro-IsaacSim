@@ -1,0 +1,422 @@
+ROSOrin Pro -> Blender -> Unreal export report
+==============================================================================
+Generated : 2026-09-29 16:56:01   (Blender 5.2.2 LTS)
+Package   : C:\Users\virtual production\Downloads\rosorin_description-claude\rosorin_description
+Entry     : urdf/rosorin.xacro   with env {"MACHINE_TYPE": "ROSOrin_Mecanum_Pro", "LIDAR_TYPE": "MS200"}
+Robot name: car   root link: base_footprint
+Outputs   : ROSOrinPro_Unreal.blend, ROSOrinPro_Unreal.fbx, ROSOrinPro_Export_Report.txt, ROSOrinPro_joint_map.json, rosorinpro_resolved.urdf
+Removed   : nothing in this final run; already absent (removed earlier): Cube, Camera, Light - deleted together with the empty default "Collection" by the first build run in this session
+
+Xacro files processed (in include order):
+  - urdf\rosorin.xacro
+  - urdf\materials.xacro
+  - urdf\pro\rosorinpro.xacro
+  - urdf\pro\inertial_matrix.xacro
+  - urdf\pro\car_mecanum.urdf.xacro
+  - urdf\pro\lidar_ms200.urdf.xacro
+  - urdf\pro\imu.urdf.xacro
+  - urdf\pro\depth_camera.urdf.xacro
+  - urdf\pro\arm.urdf.xacro
+  - urdf\pro\gripper.urdf.xacro
+Xacro conditionals:
+  - if value="${machine !=  'ROSOrin_Mecanum_Pro'}" -> False
+  - if value="${machine ==  'ROSOrin_Mecanum_Pro'}" -> True
+  - if value="${lidar == 'MS200'}" -> True
+  - if value="${lidar == 'LD19'}" -> False
+  - if value="${lidar == 'SCLIDAR'}" -> False
+
+VERIFICATION SUMMARY: ALL CHECKS PASSED
+  [PASS] all referenced visual mesh files exist -- 16 referenced, missing=[]
+  [PASS] every URDF visual mesh imported onto its link object -- 16 mesh links, not imported=[]
+  [PASS] triangle count of every imported mesh == STL file (wheels included for base_link) -- mismatches=[]
+  [PASS] imported vertex bounds == STL bounds (1:1 scale, meters) -- max deviation 0 m
+  [PASS] object set == URDF links (+ documented derived wheel links) -- objects=24 expected=24 extra=[] missing=[]
+  [PASS] every child object parented to its URDF parent link -- wrong=[]
+  [PASS] single root = base_footprint with no parent -- roots=['base_footprint']
+  [PASS] no hidden parent-inverse offsets -- objects with non-identity parent inverse: []
+  [PASS] joint pivots (object origins) == URDF joint origins (FK) -- max position error 4.14e-08 m (worst camera_link)
+  [PASS] link orientations == URDF FK -- max rotation error 1.5e-07 rad
+  [PASS] rotation axes == URDF <axis> (measured by rotating each joint 0.35 rad) -- max axis error 7.25e-07 rad over 15 movable joints
+  [PASS] joints rotate about their own origin (pivot fixed while rotating) -- max pivot drift 1.27e-08 m
+  [PASS] rest pose restored after axis test -- max deviation 1.06e-07
+  [PASS] scene units metric, 1 BU = 1 m -- system=METRIC scale_length=1.0 length_unit=METERS
+  [PASS] every object scale == 1 (local and world) -- bad=[] []
+  [PASS] overall robot size physically plausible (m) -- L x W x H = 0.2843 x 0.2119 x 0.5446 m, lowest point z=0.0017 m above base_footprint
+  [PASS] no '.001'-style duplicate object names -- found=[]
+  [PASS] no objects outside the robot (default cube/camera/light removed) -- stray=[]
+  [PASS] no shared/duplicated mesh datablocks -- meshes=20 mesh objects=20 shared=[]
+  [PASS] no two objects with identical geometry at the same place -- duplicates=[]
+  [PASS] FBX units = centimeters (UnitScaleFactor 1) -- UnitScaleFactor=1.0
+  [PASS] FBX axis system = Z up, -Y front, +X coord (Unreal import axes) -- Up=(2, 1) Front=(1, -1) Coord=(0, 1)
+  [PASS] FBX contains every robot object once -- models=24 (mesh 20, null 4)
+  [PASS] FBX hierarchy == Blender/URDF hierarchy -- mismatch=[]
+  [PASS] FBX world transforms == URDF FK (cm -> m) -- pos err 1.29e-07 m, rot err 1.46e-07 rad
+  [PASS] FBX node scales all 1, no pre/post rotations -- max |s-1|=5.96e-08, pre/post=[]
+  [PASS] FBX geometry in centimeters (base_link vertex bbox = Blender bbox x 100) -- FBX [28.4257, 16.53, 21.1265] cm vs expected [28.4257, 16.53, 21.1265] cm
+  [PASS] post-export: Blender scene restored exactly (all Blender checks re-run) -- re-run fails=[], dims identical=True
+
+1. FINAL HIERARCHY (Blender object == URDF link == Unreal component)
+------------------------------------------------------------------------------
+   base_footprint (empty)
+   `-- base_link (mesh)   <- base_joint [fixed]
+       |-- imu_link (empty)   <- imu_joint [fixed]
+       |-- left_back_wheel_link (mesh)   <- left_back_wheel [continuous]  (DERIVED)
+       |-- left_front_wheel_link (mesh)   <- left_front_wheel [continuous]  (DERIVED)
+       |-- lidar_frame (mesh)   <- lidar_joint [fixed]
+       |-- link1 (mesh)   <- joint1 [revolute]
+       |   `-- link2 (mesh)   <- joint2 [revolute]
+       |       `-- link3 (mesh)   <- joint3 [revolute]
+       |           `-- link4 (mesh)   <- joint4 [revolute]
+       |               |-- camera_link0 (mesh)   <- camera_connect_joint [fixed]
+       |               |   `-- camera_link (mesh)   <- camera_joint [fixed]
+       |               |       `-- depth_cam_frame (empty)   <- depth_cam_joint_sim [fixed]
+       |               `-- link5 (mesh)   <- joint5 [revolute]
+       |                   |-- end_effector_link (empty)   <- end_effector_joint [fixed]
+       |                   `-- gripper_link (mesh)   <- gripper_joint [fixed]
+       |                       |-- l_in_link (mesh)   <- l_in_joint [revolute] mimic r_joint x-1
+       |                       |   `-- l_out_link (mesh)   <- l_out_joint [revolute] mimic r_joint x1
+       |                       |-- l_link (mesh)   <- l_joint [revolute] mimic r_joint x1
+       |                       |-- r_in_link (mesh)   <- r_in_joint [revolute] mimic r_joint x1
+       |                       |   `-- r_out_link (mesh)   <- r_out_joint [revolute] mimic r_joint x-1
+       |                       `-- r_link (mesh)   <- r_joint [revolute]
+       |-- right_back_wheel_link (mesh)   <- right_back_wheel [continuous]  (DERIVED)
+       `-- right_front_wheel_link (mesh)   <- right_front_wheel [continuous]  (DERIVED)
+
+   24 objects: 20 URDF links (16 meshes, 4 empties) + 4 derived wheel links
+
+2. LINK -> MESH MAPPING
+------------------------------------------------------------------------------
+   link                 mesh (URDF filename)                                 STL tris  Blender  material
+   base_footprint       (no visual - Empty)                                 
+   base_link            package://rosorin_description/meshes/pro/mecanum/base_link.stl   155863    72354  M_rgba_cad1ee
+   imu_link             (no visual - Empty)                                 
+   link1                $(find rosorin_description)/meshes/pro/arm/link1.stl     7827     7827  M_rgba_cad1ee
+   link2                $(find rosorin_description)/meshes/pro/arm/link2.stl     9074     9074  M_rgba_cad1ee
+   link3                $(find rosorin_description)/meshes/pro/arm/link3.stl     9093     9093  M_rgba_cad1ee
+   link4                $(find rosorin_description)/meshes/pro/arm/link4.stl     6008     6008  M_rgba_cad1ee
+   camera_link0         package://rosorin_description/meshes/pro/arm/camera_connect_link.stl      218      218  M_rgba_cad1ee
+   camera_link          package://rosorin_description/meshes/pro/arm/camera_link.stl     6212     6212  M_rgba_cad1ee
+   depth_cam_frame      (no visual - Empty)                                 
+   link5                $(find rosorin_description)/meshes/pro/arm/link5.stl      631      631  M_rgba_cad1ee
+   end_effector_link    (no visual - Empty)                                 
+   gripper_link         $(find rosorin_description)/meshes/pro/arm/gripper_link.stl     5768     5768  M_rgba_cad1ee
+   l_in_link            package://rosorin_description/meshes/pro/gripper/l_in_link.stl      871      871  M_rgba_cad1ee
+   l_out_link           package://rosorin_description/meshes/pro/gripper/l_out_link.stl      937      937  M_rgba_cad1ee
+   l_link               package://rosorin_description/meshes/pro/gripper/l_link.stl     1208     1208  M_rgba_cad1ee
+   r_in_link            package://rosorin_description/meshes/pro/gripper/r_in_link.stl      876      876  M_rgba_cad1ee
+   r_out_link           package://rosorin_description/meshes/pro/gripper/r_out_link.stl      938      938  M_rgba_cad1ee
+   r_link               package://rosorin_description/meshes/pro/gripper/r_link.stl     1320     1320  M_rgba_cad1ee
+   lidar_frame          package://rosorin_description/meshes/pro/common/lidar_link.stl     2822     2822  M_black
+   left_front_wheel_link (split from meshes/pro/mecanum/base_link.stl)               -    20926  M_rgba_cad1ee
+   left_back_wheel_link (split from meshes/pro/mecanum/base_link.stl)               -    20975  M_rgba_cad1ee
+   right_front_wheel_link (split from meshes/pro/mecanum/base_link.stl)               -    20715  M_rgba_cad1ee
+   right_back_wheel_link (split from meshes/pro/mecanum/base_link.stl)               -    20893  M_rgba_cad1ee
+   base_link.stl: 155863 triangles in 186 loose parts -> base_link keeps 72354, wheels get 83509 (lossless)
+   Unreferenced package meshes (not imported on purpose): meshes\base_link_ack.stl, meshes\base_link_diff.stl, meshes\base_link_mec.stl
+
+3. JOINTS: PARENT/CHILD, TYPE, AXIS, LIMITS, MIMIC
+------------------------------------------------------------------------------
+   joint                  type       parent         child              axis (joint frame)               limits / mimic
+   base_joint             fixed      base_footprint base_link          -                                
+   lidar_joint            fixed      base_link      lidar_frame        -                                
+   imu_joint              fixed      base_link      imu_link           -                                
+   camera_connect_joint   fixed      link4          camera_link0       -                                
+   camera_joint           fixed      camera_link0   camera_link        -                                
+   depth_cam_joint_sim    fixed      camera_link    depth_cam_frame    -                                
+   joint1                 revolute   base_link      link1              -5.4513E-05 -0.0087266 -0.99996  [-2.09, 2.09] rad, effort 1000, vel 10
+   joint2                 revolute   link1          link2              0 0.99996 -0.0087265             [-2.09, 2.09] rad, effort 1000, vel 10
+   joint3                 revolute   link2          link3              0 1 0                            [-2.09, 2.09] rad, effort 1000, vel 10
+   joint4                 revolute   link3          link4              0 1 0                            [-2.09, 2.09] rad, effort 1000, vel 10
+   joint5                 revolute   link4          link5              0 0 -1                           [-2.09, 2.09] rad, effort 1000, vel 10
+   gripper_joint          fixed      link5          gripper_link       -                                
+   end_effector_joint     fixed      link5          end_effector_link  -                                
+   l_joint                revolute   gripper_link   l_link             -1 0 -0.0026676                  [-1.57, 1.57] rad, effort 1000, vel 10  mimic r_joint*1+0
+   r_joint                revolute   gripper_link   r_link             0.99998 1.524E-05 -0.0060469     [-1.57, 1.57] rad, effort 1000, vel 10
+   l_in_joint             revolute   gripper_link   l_in_link          1 0 0.0026676                    [-1.57, 1.57] rad, effort 1000, vel 10  mimic r_joint*-1+0
+   l_out_joint            revolute   l_in_link      l_out_link         1 0 0.0026676                    [-1.57, 1.57] rad, effort 1000, vel 10  mimic r_joint*1+0
+   r_in_joint             revolute   gripper_link   r_in_link          1 0 0.0026676                    [-1.57, 1.57] rad, effort 1000, vel 10  mimic r_joint*1+0
+   r_out_joint            revolute   r_in_link      r_out_link         0.99997 -0.0069812 0.0026676     [-1.57, 1.57] rad, effort 1000, vel 10  mimic r_joint*-1+0
+   left_front_wheel       continuous base_link      left_front_wheel_link 0 1 0 (derived)                    DERIVED
+   left_back_wheel        continuous base_link      left_back_wheel_link 0 1 0 (derived)                    DERIVED
+   right_front_wheel      continuous base_link      right_front_wheel_link 0 1 0 (derived)                    DERIVED
+   right_back_wheel       continuous base_link      right_back_wheel_link 0 1 0 (derived)                    DERIVED
+
+   Measured axis check (each movable joint rotated 0.35 rad in Blender):
+   joint                  child              expected world axis at rest                axis err pivot drift
+   joint1                 link1              (-0.000055, -0.000000, -1.000000)       0.00e+00   5.35e-11 m
+   joint2                 link2              (+0.000000, +1.000000, -0.000000)       0.00e+00   2.53e-09 m
+   joint3                 link3              (+0.000000, +0.999962, +0.008726)       0.00e+00   1.25e-08 m
+   joint4                 link4              (+0.000000, +0.999962, +0.008726)       0.00e+00   1.27e-08 m
+   joint5                 link5              (+0.000000, +0.008726, -0.999962)       0.00e+00   4.84e-10 m
+   l_joint                l_link             (-0.999996, +0.000023, -0.002667)       5.16e-08   3.39e-09 m
+   r_joint                r_link             (+0.999996, -0.000033, +0.002745)       7.25e-07   5.04e-09 m
+   l_in_joint             l_in_link          (+0.999996, -0.000023, +0.002667)       9.42e-08   2.56e-09 m
+   l_out_joint            l_out_link         (+0.999996, -0.000023, +0.002667)       0.00e+00   3.34e-09 m
+   r_in_joint             r_in_link          (+0.999996, -0.000023, +0.002667)       9.42e-08   1.20e-09 m
+   r_out_joint            r_out_link         (+0.999996, -0.000023, +0.002668)       0.00e+00   9.27e-09 m
+   left_front_wheel       left_front_wheel_link (+0.000000, +1.000000, +0.000000)       0.00e+00   7.39e-10 m
+   left_back_wheel        left_back_wheel_link (+0.000000, +1.000000, +0.000000)       0.00e+00   9.69e-10 m
+   right_front_wheel      right_front_wheel_link (+0.000000, +1.000000, +0.000000)       0.00e+00   4.53e-10 m
+   right_back_wheel       right_back_wheel_link (+0.000000, +1.000000, +0.000000)       0.00e+00   9.69e-10 m
+
+4. JOINT ORIGIN TRANSFORMS (child frame in parent frame, at joint position 0)
+------------------------------------------------------------------------------
+   ROS/Blender: meters, rpy radians (URDF literal).  Unreal: cm, FRotator degrees (Pitch, Yaw, Roll).
+   base_joint  (base_footprint -> base_link)
+       ROS xyz = 0.0 0.0 0.025   rpy = 0 0 0
+       UE  loc = (0.00000, -0.00000, 2.50000) cm   rot = (P=-0.00000, Y=-0.00000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0000000, 1.0000000)
+   lidar_joint  (base_link -> lidar_frame)
+       ROS xyz = 0.048156 7.5552E-05 0.106748   rpy = 0 0 0
+       UE  loc = (4.81560, -0.00756, 10.67480) cm   rot = (P=-0.00000, Y=-0.00000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0000000, 1.0000000)
+   imu_joint  (base_link -> imu_link)
+       ROS xyz = -0.027258 -5.6404E-05 0.048046   rpy = 0 -0.0087266 1.5707
+       UE  loc = (-2.72580, 0.00564, 4.80460) cm   rot = (P=0.50000, Y=-89.99448, R=0.00000) deg   quat(xyzw) = (-0.0030852, -0.0030855, -0.7070660, 0.7071341)
+   camera_connect_joint  (link4 -> camera_link0)
+       ROS xyz = -0.036369 -0.0181 0.046638   rpy = -1.5621 -1.5621 1.5708
+       UE  loc = (-3.63690, 1.81000, 4.66380) cm   rot = (P=89.50174, Y=-90.00021, R=-89.50174) deg   quat(xyzw) = (-0.0000013, -0.7070801, -0.0061505, 0.7071068)
+   camera_joint  (camera_link0 -> camera_link)
+       ROS xyz = 0.022511 -0.0010257 0.0051917   rpy = 0 0 0
+       UE  loc = (2.25110, 0.10257, 0.51917) cm   rot = (P=-0.00000, Y=-0.00000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0000000, 1.0000000)
+   depth_cam_joint_sim  (camera_link -> depth_cam_frame)
+       ROS xyz = 0 0 0   rpy = -1.5707963267948966 0 -1.5707963267948966
+       UE  loc = (0.00000, -0.00000, 0.00000) cm   rot = (P=-0.00000, Y=90.00000, R=-90.00000) deg   quat(xyzw) = (0.5000000, 0.5000000, 0.5000000, 0.5000000)
+   joint1  (base_link -> link1)
+       ROS xyz = 0.04662 7.5437E-05 0.16044   rpy = 0.0087266 0 0
+       UE  loc = (4.66200, -0.00754, 16.04400) cm   rot = (P=-0.00000, Y=-0.00000, R=0.50000) deg   quat(xyzw) = (-0.0043633, 0.0000000, -0.0000000, 0.9999905)
+       UE joint axis = (0.0000545, -0.0087266, 0.9999619)
+   joint2  (link1 -> link2)
+       ROS xyz = 1.2011E-05 0.018766 0.030345   rpy = 0 0 0
+       UE  loc = (0.00120, -1.87660, 3.03450) cm   rot = (P=-0.00000, Y=-0.00000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0000000, 1.0000000)
+       UE joint axis = (-0.0000000, 0.9999619, 0.0087265)
+   joint3  (link2 -> link3)
+       ROS xyz = 0.00025563 0.00074282 0.08513   rpy = 0 0 0
+       UE  loc = (0.02556, -0.07428, 8.51300) cm   rot = (P=-0.00000, Y=-0.00000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0000000, 1.0000000)
+       UE joint axis = (-0.0000000, 1.0000000, -0.0000000)
+   joint4  (link3 -> link4)
+       ROS xyz = -0.00056892 0.00074297 0.085147   rpy = 0 0 0
+       UE  loc = (-0.05689, -0.07430, 8.51470) cm   rot = (P=-0.00000, Y=-0.00000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0000000, 1.0000000)
+       UE joint axis = (-0.0000000, 1.0000000, -0.0000000)
+   joint5  (link4 -> link5)
+       ROS xyz = -0.0010116 -0.018014 0.05577   rpy = 0 0 0
+       UE  loc = (-0.10116, 1.80140, 5.57700) cm   rot = (P=-0.00000, Y=-0.00000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0000000, 1.0000000)
+       UE joint axis = (-0.0000000, 0.0000000, 1.0000000)
+   gripper_joint  (link5 -> gripper_link)
+       ROS xyz = 0 0 0.0030019   rpy = -3.1416 -1.5681 3.1416
+       UE  loc = (0.00000, -0.00000, 0.30019) cm   rot = (P=89.84551, Y=-180.00042, R=-180.00042) deg   quat(xyzw) = (-0.0000000, -0.7080594, 0.0000000, 0.7061529)
+   end_effector_joint  (link5 -> end_effector_link)
+       ROS xyz = 0 0 0.08   rpy = 0 0 0
+       UE  loc = (0.00000, -0.00000, 8.00000) cm   rot = (P=-0.00000, Y=-0.00000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0000000, 1.0000000)
+   l_joint  (gripper_link -> l_link)
+       ROS xyz = 0.024 0.014 0.0075   rpy = 3.1416 1.5681 3.1416
+       UE  loc = (2.40000, -1.40000, 0.75000) cm   rot = (P=-89.84551, Y=-180.00042, R=180.00042) deg   quat(xyzw) = (0.0000000, 0.7080594, 0.0000000, 0.7061529)
+       UE joint axis = (0.9999964, 0.0000000, 0.0026676)
+   r_joint  (gripper_link -> r_link)
+       ROS xyz = 0.024 -0.014 0.0061523   rpy = -0.0038422 1.5647 -0.012569
+       UE  loc = (2.40000, 1.40000, 0.61523) cm   rot = (P=-89.65071, Y=0.72015, R=-0.22014) deg   quat(xyzw) = (-0.0030677, 0.7049414, 0.0031031, 0.7092521)
+       UE joint axis = (-0.9999817, 0.0000152, 0.0060469)
+   l_in_joint  (gripper_link -> l_in_link)
+       ROS xyz = 0.042974 0.005 0.0075   rpy = 3.1416 1.5681 3.1416
+       UE  loc = (4.29740, -0.50000, 0.75000) cm   rot = (P=-89.84551, Y=-180.00042, R=180.00042) deg   quat(xyzw) = (0.0000000, 0.7080594, 0.0000000, 0.7061529)
+       UE joint axis = (-0.9999964, 0.0000000, -0.0026676)
+   l_out_joint  (l_in_link -> l_out_link)
+       ROS xyz = 0.0029407 0.018641 0.022223   rpy = 0 0 0
+       UE  loc = (0.29407, -1.86410, 2.22230) cm   rot = (P=-0.00000, Y=-0.00000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0000000, 1.0000000)
+       UE joint axis = (-0.9999964, 0.0000000, -0.0026676)
+   r_in_joint  (gripper_link -> r_in_link)
+       ROS xyz = 0.042974 -0.005 0.0075   rpy = 3.1416 1.5681 3.1416
+       UE  loc = (4.29740, 0.50000, 0.75000) cm   rot = (P=-89.84551, Y=-180.00042, R=180.00042) deg   quat(xyzw) = (0.0000000, 0.7080594, 0.0000000, 0.7061529)
+       UE joint axis = (-0.9999964, 0.0000000, -0.0026676)
+   r_out_joint  (r_in_link -> r_out_link)
+       ROS xyz = -5.9262E-05 -0.018641 0.022215   rpy = 0 0 0.0069813
+       UE  loc = (-0.00593, 1.86410, 2.22150) cm   rot = (P=-0.00000, Y=-0.40000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0034906, 0.9999939)
+       UE joint axis = (-0.9999721, -0.0069812, -0.0026676)
+   left_front_wheel  (base_link -> left_front_wheel_link)
+       ROS xyz = 0.09097 0.067865 0.017096   rpy = 0 0 0
+       UE  loc = (9.09700, -6.78650, 1.70960) cm   rot = (P=-0.00000, Y=-0.00000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0000000, 1.0000000)
+       UE joint axis = (-0.0000000, 1.0000000, -0.0000000)
+   left_back_wheel  (base_link -> left_back_wheel_link)
+       ROS xyz = -0.080677 0.067865 0.016719   rpy = 0 0 0
+       UE  loc = (-8.06770, -6.78650, 1.67190) cm   rot = (P=-0.00000, Y=-0.00000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0000000, 1.0000000)
+       UE joint axis = (-0.0000000, 1.0000000, -0.0000000)
+   right_front_wheel  (base_link -> right_front_wheel_link)
+       ROS xyz = 0.090972 -0.067717 0.017098   rpy = 0 0 0
+       UE  loc = (9.09720, 6.77170, 1.70980) cm   rot = (P=-0.00000, Y=-0.00000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0000000, 1.0000000)
+       UE joint axis = (-0.0000000, 1.0000000, -0.0000000)
+   right_back_wheel  (base_link -> right_back_wheel_link)
+       ROS xyz = -0.080677 -0.067717 0.016719   rpy = 0 0 0
+       UE  loc = (-8.06770, 6.77170, 1.67190) cm   rot = (P=-0.00000, Y=-0.00000, R=0.00000) deg   quat(xyzw) = (-0.0000000, 0.0000000, -0.0000000, 1.0000000)
+       UE joint axis = (-0.0000000, 1.0000000, -0.0000000)
+
+   World (base_footprint) pose of every link at zero joint positions [m]:
+     base_footprint       ( 0.000000,  0.000000,  0.000000)
+     base_link            ( 0.000000,  0.000000,  0.025000)
+     imu_link             (-0.027258, -0.000056,  0.073046)
+     link1                ( 0.046620,  0.000075,  0.185440)
+     link2                ( 0.046632,  0.018576,  0.215948)
+     link3                ( 0.046888,  0.018576,  0.301081)
+     link4                ( 0.046319,  0.018576,  0.386231)
+     camera_link0         ( 0.009950,  0.000069,  0.432709)
+     camera_link          ( 0.004767, -0.001002,  0.455220)
+     depth_cam_frame      ( 0.004767, -0.001002,  0.455220)
+     link5                ( 0.045307,  0.000076,  0.441842)
+     end_effector_link    ( 0.045307, -0.000622,  0.521839)
+     gripper_link         ( 0.045307,  0.000050,  0.444844)
+     l_in_link            ( 0.037691,  0.004675,  0.487839)
+     l_out_link           ( 0.040632,  0.023121,  0.510224)
+     l_link               ( 0.037742,  0.013840,  0.468944)
+     r_in_link            ( 0.037691, -0.005325,  0.487752)
+     r_out_link           ( 0.037632, -0.024159,  0.509803)
+     r_link               ( 0.039090, -0.014159,  0.468704)
+     lidar_frame          ( 0.048156,  0.000076,  0.131748)
+     left_front_wheel_link ( 0.090970,  0.067865,  0.042096)
+     left_back_wheel_link (-0.080677,  0.067865,  0.041719)
+     right_front_wheel_link ( 0.090972, -0.067717,  0.042098)
+     right_back_wheel_link (-0.080677, -0.067717,  0.041719)
+
+5. BLENDER -> UNREAL COORDINATE CONVERSION
+------------------------------------------------------------------------------
+   Blender scene = ROS REP-103 frame: right-handed, +X forward, +Y left, +Z up, 1 BU = 1 m.
+   Unreal:                           left-handed,  +X forward, +Y right, +Z up, 1 uu = 1 cm.
+   FBX file: UnitScaleFactor = 1 (cm), Up = +Z, Front = -Y, Coord = +X, right-handed.
+   That is exactly Unreal's FBX import axis system (Z-up, -Y front), so the importer applies no
+   axis rotation and only its right->left handed flip (Y -> -Y). Net mapping:
+       position     : UE(x, y, z) cm = (100*x, -100*y, 100*z)  with ROS (x, y, z) in m
+       orientation  : UE FRotator(Pitch, Yaw, Roll) = (-pitch, -yaw, +roll) of the URDF rpy, in degrees
+       quaternion   : UE (X, Y, Z, W) = (-qx, qy, -qz, qw)
+       joint axis   : UE axis = (-ax, ay, -az);  rotation = FQuat(UEAxis, q) with q straight from /joint_states
+       /odom        : actor location = (100*x, -100*y, 100*z) of odom->base_footprint,
+                      actor rotation = (-qx, qy, -qz, qw) of its quaternion.
+   Driving a joint in Unreal:  Comp->SetRelativeRotation(RestRelativeQuat * FQuat(UEAxis, q))
+   (RestRelativeQuat = the component's imported relative rotation; FQuat A*B applies B first).
+   Mimic joints (gripper): q_child = multiplier * q_r_joint + offset (see table above).
+   Import in Unreal with: Force Front X Axis = OFF, Convert Scene = ON (default), Convert Scene Unit = ON
+   (no-op, file is already cm), Import Uniform Scale = 1.0, Transform Vertex To Absolute = OFF,
+   Bake Pivot In Vertex = OFF, Combine Meshes = OFF. Use File > Import Into Level to get the hierarchy:
+   one actor per URDF link (named like the link, attached like the URDF tree) under an identity
+   'RootNode' actor that Interchange creates for the FBX scene root; static mesh assets are named
+   SM_<link> (UE 5.8 Interchange appends '_001', e.g. SM_link1_001 - cosmetic).
+   Drive base_footprint (or RootNode) from /odom. If you convert the actors to one Blueprint
+   (Convert Selection to Blueprint Class), re-check the component attachment afterwards.
+
+   WHEEL KINEMATICS (derived wheels, not in /joint_states):
+     omega_i = ((vx - wz*y_i)*ux_i + (vy + wz*x_i)*uy_i) / (r_i * ux_i)  ~= (vx - wz*y_i + s_i*(vy + wz*x_i)) / r_i for 45 deg rollers
+     inputs: vx, vy [m/s], wz [rad/s] = /odom twist (child frame base_footprint); omega_i [rad/s] about the wheel joint axis +Y; integrate omega_i*dt for the wheel joint position
+     wheel joint               x_i [m]    y_i [m]   r_i [m] bottom roller dir (XY)    s_i
+     left_front_wheel          0.09097    0.08716   0.04000   (+0.711, -0.703) -44.7deg  -1
+     left_back_wheel          -0.08068    0.08696   0.04008   (+0.714, +0.700) +44.5deg  +1
+     right_front_wheel         0.09097   -0.08701   0.04000   (+0.717, +0.697) +44.2deg  +1
+     right_back_wheel         -0.08068   -0.08722   0.04008   (+0.712, -0.702) -44.6deg  -1
+     (x_i, y_i = mean ground contact below each wheel axis in base_footprint; s_i from the measured
+      direction of the roller currently at the bottom of each wheel - all rollers of a wheel share it.)
+
+6. FBX EXPORT SETTINGS USED (bpy.ops.export_scene.fbx)
+------------------------------------------------------------------------------
+   use_selection            = True
+   use_visible              = False
+   use_active_collection    = False
+   object_types             = ['EMPTY', 'MESH']
+   global_scale             = 1.0
+   apply_unit_scale         = True
+   apply_scale_options      = FBX_SCALE_NONE
+   use_space_transform      = True
+   bake_space_transform     = False
+   axis_forward             = Y
+   axis_up                  = Z
+   use_mesh_modifiers       = True
+   mesh_smooth_type         = FACE
+   use_subsurf              = False
+   use_mesh_edges           = False
+   use_tspace               = False
+   use_triangles            = True
+   use_custom_props         = True
+   colors_type              = NONE
+   add_leaf_bones           = False
+   bake_anim                = False
+   path_mode                = AUTO
+   embed_textures           = False
+   batch_mode               = OFF
+   use_metadata             = True
+   (temporary during export) scene.unit_settings.scale_length = 0.01
+   (temporary during export) vertices & local translations = x100 (m -> cm), restored afterwards
+   Meaning: during export the scene temporarily uses 1 BU = 1 cm (all vertices and local translations
+   x100, unit scale 0.01). apply_unit_scale then gives a unit factor of 100*0.01 = 1 and axis Y-forward/
+   Z-up is identity, so the exporter's global matrix is identity: plain centimeter values, UnitScaleFactor 1,
+   every node scale 1, no root correction rotation. The original meter values are restored bit-exactly
+   afterwards and re-verified (see 'post-export' checks). 'Apply Transform' (bake_space_transform) is
+   deliberately OFF: in Blender 5.2 it corrupts nested hierarchies (verified during development).
+
+   FBX read-back verification (parsed from the written file):
+     fbx_version                7400
+     UnitScaleFactor            1.0
+     OriginalUnitScaleFactor    1.0
+     UpAxis                     (2, 1)
+     FrontAxis                  (1, -1)
+     CoordAxis                  (0, 1)
+     models                     24
+     mesh_models                20
+     null_models                4
+     world_pos_err_m            1.2938177383316097e-07
+     world_rot_err_rad          1.4585395716857817e-07
+     max_scale_deviation        5.960464477539063e-08
+     nonzero_pre_post_rotation  []
+     hierarchy_mismatch         []
+     base_link_vertex_bbox_cm   [28.4256649017334, 16.53000259399414, 21.126524955034256]
+     size_bytes                 6550540
+
+7. WARNINGS / UNRESOLVED ISSUES / DECISIONS
+------------------------------------------------------------------------------
+   W1. LIDAR_TYPE is read with $(env LIDAR_TYPE) and is not defined anywhere in the package. The three lidar xacros use the same mesh and position and differ only in lidar_joint yaw: MS200 = 0, LD19 = 3.1416, SCLIDAR = 3.1415926535897931. This build uses LIDAR_TYPE=MS200 (yaw 0 0 0). If your robot has another lidar, re-run the script with --lidar LD19 / SCLIDAR (or rotate lidar_frame 180 deg about its Z).
+   W2. The Pro URDF (car_mecanum.urdf.xacro) has NO wheel links/joints: the four mecanum wheels are baked into meshes/pro/mecanum/base_link.stl. To allow independent wheel rotation they were split out losslessly (83509 of 155863 triangles; whole loose parts only, 29 loose parts per wheel = hub, hub cap, 9 rollers and their roller pins; motors stay in base_link). Wheel link and joint names and frames come from urdf/rosorin_old.xacro (left_front_wheel etc., declared 'fixed', axis 0 0 0 there; same chassis); here they are typed 'continuous' about +Y of the wheel frame. Geometry cross-check: wheel centroid is 0.19 mm max from the source frame axis, symmetry axis within 0.095 deg of Y, outer radius 0.0400 m. These joints are NOT in the robot's /joint_states - compute wheel spin in Unreal from the /odom twist with the mecanum equations in the WHEEL KINEMATICS section. Positive rotation about +Y rolls the robot forward on both sides.
+   W3. Gripper: closed-chain linkage expressed with mimic joints. Only r_joint is independent; l_joint (x1), l_in_joint (x-1), l_out_joint (x1), r_in_joint (x1), r_out_joint (x-1) follow it. The FBX has no constraints - apply q = multiplier * q_r_joint + offset in Unreal (joint_state_publisher also publishes the mimic joints, so they may already be present in /joint_states).
+   W4. URDF values are used literally, including rounded pi values (e.g. gripper_joint rpy = -3.1416 -1.5681 3.1416, l_joint rpy = 3.1416 1.5681 3.1416). This matches what robot_state_publisher computes on the robot.
+   W5. Some URDF joint axes are not exactly unit length (joint1 |axis|=0.9999981, joint2 |axis|=0.9999981, l_joint |axis|=1.0000036, r_joint |axis|=0.9999983, l_in_joint |axis|=1.0000036, l_out_joint |axis|=1.0000036, r_in_joint |axis|=1.0000036, r_out_joint |axis|=0.9999979); they are normalized (as ROS/KDL does) for rotation. Literal values are kept in the ros_joint_axis custom property.
+   W6. Commented-out / unused files: urdf/pro/common.urdf.xacro (back_shell_black/green links) references meshes/pro/common/back_shell_*.stl that do not exist in the package, and urdf/pro/connect.urdf.xacro defines a conflicting joint1 origin. Both includes are commented out in rosorinpro.xacro, so they are not part of the Pro model and nothing is missing.
+   W7. Non-Pro chassis meshes (meshes/base_link_ack.stl, base_link_diff.stl, base_link_mec.stl) belong to the ROSOrin_Acker / _Differential / _Mecanum machine types and were not imported.
+   W8. Collision geometry in the URDF is identical to the visual STLs; no separate collision meshes were exported (in Unreal use 'Use Complex as Simple' or generate convex hulls).
+   W9. base_joint z = 0.025 m while the lowest base_link vertex is at z = -0.0233 m, so the model rests 1.7 mm above the base_footprint plane. Kept as-is (URDF exact).
+   W10. imu_link has no visual; its URDF inertial block duplicates base_link's mass (0.8087 kg). Irrelevant for visuals, kept as an Empty frame.
+   W11. URDF colours are applied as sRGB (converted to linear Base Color) on 2 shared materials; wheels use base_link's material because they were part of its visual.
+   W12. On import Unreal 5.8 logs 'degenerate tangent bases' / 'nearly zero bi-normals' Display messages for the small gripper, camera and link meshes (thin CAD sliver triangles in the source STLs). They are informational only; geometry and transforms are unaffected.
+   note: removed previous 'ROSOrinPro' collection
+
+8. UNREAL ENGINE IMPORT TEST (5.8.3-58210709+++UE5+Release-5.8, Interchange scene import = File > Import Into Level)
+------------------------------------------------------------------------------
+   RESULT: ALL CHECKS PASSED
+   [PASS] Interchange scene import succeeded -- import_scene returned True
+   [PASS] one static mesh asset per mesh link (SM_<link>, optional Interchange _NNN suffix) -- 20 assets for 20 mesh links, e.g. ['SM_base_link_001', 'SM_camera_link0_001']
+   [PASS] one actor per link, named like the URDF link -- missing=[]
+   [PASS] actor attachment hierarchy == URDF -- mismatch=[]
+   [PASS] scene root above base_footprint is identity -- base_footprint is attached to 'RootNode' (Interchange FBX scene root)
+   [PASS] world locations == URDF FK in UE space (x,-y,z)*100 cm -- max error 1.26e-05 cm
+   [PASS] world orientations == URDF FK mirrored into UE axes -- max axis error 8.19e-06 deg
+   [PASS] every actor scale == 1 -- bad=[]
+   [PASS] static mesh size in cm (SM_base_link bbox) -- 28.426 x 16.530 x 21.127 cm
+   Static mesh bounds in UE (cm, pivot = link frame, Y mirrored):
+     SM_base_link     min (-14.266, -8.273, -0.300)  max (14.159, 8.257, 20.826)
+     SM_link1         min (-2.398, -2.399, -0.371)  max (2.398, 2.395, 3.955)
+     SM_lidar_frame   min (-2.682, -2.684, -3.430)  max (2.695, 1.925, -0.000)
+   Actor world locations in UE (cm) and deviation from URDF FK:
+     base_footprint           (   0.0000,    0.0000,    0.0000)   dpos 0.00e+00 cm   drot 0.00e+00 deg
+     base_link                (   0.0000,    0.0000,    2.5000)   dpos 0.00e+00 cm   drot 0.00e+00 deg
+     lidar_frame              (   4.8156,   -0.0076,   13.1748)   dpos 0.00e+00 cm   drot 0.00e+00 deg
+     imu_link                 (  -2.7258,    0.0056,    7.3046)   dpos 0.00e+00 cm   drot 3.00e-06 deg
+     link1                    (   4.6620,   -0.0075,   18.5440)   dpos 1.00e-06 cm   drot 0.00e+00 deg
+     link2                    (   4.6632,   -1.8576,   21.5948)   dpos 1.00e-06 cm   drot 0.00e+00 deg
+     link3                    (   4.6888,   -1.8576,   30.1081)   dpos 2.00e-06 cm   drot 0.00e+00 deg
+     link4                    (   4.6319,   -1.8576,   38.6231)   dpos 2.00e-06 cm   drot 0.00e+00 deg
+     link5                    (   4.5307,   -0.0076,   44.1842)   dpos 4.00e-06 cm   drot 0.00e+00 deg
+     gripper_link             (   4.5307,   -0.0050,   44.4843)   dpos 5.00e-06 cm   drot 0.00e+00 deg
+     end_effector_link        (   4.5307,    0.0622,   52.1839)   dpos 7.00e-06 cm   drot 0.00e+00 deg
+     l_link                   (   3.7742,   -1.3840,   46.8944)   dpos 7.00e-06 cm   drot 0.00e+00 deg
+     r_link                   (   3.9090,    1.4159,   46.8704)   dpos 8.00e-06 cm   drot 2.00e-06 deg
+     l_in_link                (   3.7691,   -0.4675,   48.7839)   dpos 1.00e-05 cm   drot 0.00e+00 deg
+     l_out_link               (   4.0632,   -2.3121,   51.0224)   dpos 1.30e-05 cm   drot 0.00e+00 deg
+     r_in_link                (   3.7691,    0.5325,   48.7752)   dpos 4.00e-06 cm   drot 0.00e+00 deg
+     r_out_link               (   3.7632,    2.4159,   50.9803)   dpos 1.00e-06 cm   drot 0.00e+00 deg
+     left_front_wheel_link    (   9.0970,   -6.7865,    4.2096)   dpos 0.00e+00 cm   drot 0.00e+00 deg
+     left_back_wheel_link     (  -8.0677,   -6.7865,    4.1719)   dpos 0.00e+00 cm   drot 0.00e+00 deg
+     right_front_wheel_link   (   9.0972,    6.7717,    4.2098)   dpos 1.00e-06 cm   drot 0.00e+00 deg
+     right_back_wheel_link    (  -8.0677,    6.7717,    4.1719)   dpos 0.00e+00 cm   drot 0.00e+00 deg
+     camera_link0             (   0.9950,   -0.0069,   43.2709)   dpos 3.00e-06 cm   drot 7.00e-06 deg
+     camera_link              (   0.4767,    0.1002,   45.5220)   dpos 5.00e-06 cm   drot 7.00e-06 deg
+     depth_cam_frame          (   0.4767,    0.1002,   45.5220)   dpos 2.00e-06 cm   drot 8.00e-06 deg

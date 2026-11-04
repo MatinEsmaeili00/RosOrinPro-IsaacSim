@@ -4,7 +4,7 @@
 
 ```mermaid
 flowchart LR
-    A["Hiwonder rosorin_description<br/>xacro + STL"] --> B["rosorinpro_resolved.urdf<br/>(RosOrinProMesh build)"]
+    A["sources/rosorin_description<br/>Hiwonder xacro + STL"] --> B["sources/RosOrinProMesh/<br/>rosorinpro_resolved.urdf"]
     B --> C["scripts/build_sim_urdf.py"]
     CFG["config/rosorin_pro_sim.yaml"] --> C
     C --> D["description/urdf/rosorin_pro_sim.urdf<br/>+ wheel / roller meshes"]
@@ -18,6 +18,7 @@ flowchart LR
     I --> K["scenes/test_arena.usd"]
 ```
 
+All inputs are in `sources/` (origin and checks: [sources/README.md](../sources/README.md)).
 `launch\build_all.bat` runs the four scripts in order. Each one stops the build with a non-zero exit code on
 failure; Kit would otherwise return 0, so the scripts wrap `main()` and call `os._exit(1)`.
 
@@ -115,4 +116,4 @@ flowchart LR
 | `tests/test_twin_battery.py` | Twin mode against a fake robot on domain 42; battery topic; latched `/robot_description` |
 | `tests/tune_mecanum.py` | Physics parameter sweeps (contact compliance, rate, solver iterations, ...) with timing |
 | `tests/bench_perf.py` | Frame time per configuration, with `--fabric` |
-| `ros2_tools/check_topics.py`, `demo_square.py` | Cross-process checks from a separate ROS 2 program |
+| `ros2_tools/check_topics.py`, `sensor_snapshot.py`, `demo_square.py` | Cross-process checks from a separate ROS 2 program (also against the real robot). How to run them: [TESTING.md](TESTING.md) |

@@ -1,6 +1,6 @@
 {
-  "source_package": "C:\\isaac-sim-standalone-6.2.0\\rosorin_description-claude\\rosorin_description",
-  "resolved_urdf": "C:\\isaac-sim-standalone-6.2.0\\rosorin_description-claude\\rosorinpro_resolved.urdf",
+  "source_package": "sources/rosorin_description",
+  "resolved_urdf": "sources/RosOrinProMesh/rosorinpro_resolved.urdf",
   "lidar_variant": "SCLIDAR",
   "copied_meshes": [
     "pro/mecanum/base_link.stl",

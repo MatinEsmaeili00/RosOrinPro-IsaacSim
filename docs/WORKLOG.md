@@ -160,6 +160,37 @@ physics API: `XformPrim` returned stale USD values, which had broken the first g
 | Twin + battery + robot_description | 5 / 5 |
 | GUI launcher | scene opens, runtime starts, 18 / 18 topics seen by an external ROS 2 program, ~34 FPS |
 
+## 15. Sources and testing guide (follow-up request, 3 November 2026)
+
+> **Request:** put all the sources used into the repository, and explain how to test that it works (basic).
+
+* **`sources/`:** the inputs copied unchanged, so the repository builds on its own. These are Hiwonder's
+  `rosorin_description`, the four RosOrinProMesh files the build reads or checks against, and the feature list
+  with the real robot's topic screenshots. `config/rosorin_pro_sim.yaml` now points there. The copies match the
+  originals byte for byte, and rebuilding `description/` from them gives an identical URDF and meshes.
+  Hiwonder publishes the package on GitHub ([Hiwonder/ROSOrin-Pro](https://github.com/Hiwonder/ROSOrin-Pro),
+  also with no license). 48 of its 52 files are identical to the robot's copy; the 4 that differ are not used.
+* **[SOURCES.md](SOURCES.md):** every specification with the page it came from and where it is used, plus
+  the Isaac Sim 6.2 files used as API references.
+* **[TESTING.md](TESTING.md):** five basic checks with real expected output (GUI, topics, sensors,
+  driving and arm, automated test), checking from another computer, and troubleshooting.
+* **New tool `ros2_tools/sensor_snapshot.py`:** one message per sensor, with PASS/FAIL checks and PNG
+  pictures of the camera, depth and lidar. The lidar picture is drawn in the robot frame through TF, because
+  the SCLIDAR frame is turned 180°. It needs no imaging library and runs on the real robot too.
+* **Re-verified on 2026-11-03:**
+
+  | Check | Result |
+  |---|---|
+  | `check_topics.py` | 18/18 topics |
+  | `sensor_snapshot.py` | 6/6 sensors |
+  | `arm.py` | poses within 0.017 rad |
+  | `demo_square.py` | 8 mm, −0.9° |
+  | `run_tests.bat` | 35/35 in 124 s |
+* **Found while writing the test guide:** in the arena about 150 of the 400 lidar beams return nothing.
+  A ray cast of the URDF meshes shows that the beam, placed at the URDF's `lidar_frame` on the top face of the
+  lidar housing, grazes the chassis. The data is in [DECISIONS.md](DECISIONS.md) § 8, and the item is added
+  to the open items below.
+
 ## Not done / open items
 
 * **Not tested against the physical robot.** No robot topics were visible on the network during this
@@ -170,4 +201,8 @@ physics API: `XformPrim` returned stale USD values, which had broken the first g
   `ros_robot_controller_msgs` built for Windows. The standard-message equivalents are documented.
 * The real lidar's angle convention (COIN-D6 rotates clockwise) and the depth encoding of the Aurora driver
   should be confirmed with a recording from the robot, e.g. `ros2 bag record /scan /depth_cam/depth0/image_raw`.
+* **Lidar beam height:** the simulated beam sits on top of the lidar housing (URDF `lidar_frame`) and
+  ~150/400 beams hit the chassis. Run `ros2_tools/sensor_snapshot.py` on the real robot and compare
+  `scan.png`. If the real scan has fewer gaps, lower the emitter, which is the `coin_d6` translate in
+  `scripts/configure_robot.py`. About 16 mm lower leaves only the 64–69 beams blocked by the structure behind it.
 * The physics runs at 0.5–0.6× real time on this PC's CPU (Xeon, Cascade Lake). Use `use_sim_time:=true`.

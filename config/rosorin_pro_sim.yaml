@@ -3,10 +3,11 @@
 # "estimate" are engineering estimates (documented in docs/DECISIONS.md).
 
 description:
-  # Hiwonder package (xacro + STL). Relative paths are resolved against the repo root.
-  source_package: ../rosorin_description-claude/rosorin_description
+  # Hiwonder package (xacro + STL), vendored in sources/ (origin: sources/README.md). Relative paths are
+  # resolved against the repo root.
+  source_package: sources/rosorin_description
   # Flattened URDF from the RosOrinProMesh build (MACHINE_TYPE=ROSOrin_Mecanum_Pro).
-  resolved_urdf: ../rosorin_description-claude/rosorinpro_resolved.urdf
+  resolved_urdf: sources/RosOrinProMesh/rosorinpro_resolved.urdf
   # Wheel frames come from the older xacro of the same chassis (the Pro URDF has no wheel links).
   wheel_frames_xacro: urdf/rosorin_old.xacro
   # Lidar variant decides only the lidar_joint yaw. The real robot runs /sclidar_scan_publisher
