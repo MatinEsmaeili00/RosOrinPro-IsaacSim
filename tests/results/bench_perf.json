@@ -1,0 +1,29 @@
+{
+  "full: 480 Hz + cameras + lidar (scene renderer)": {
+    "ms_per_frame": 48.86364837487538,
+    "real_time_factor": 0.3410851874752009,
+    "hz": 480,
+    "cameras": true,
+    "lidar": true,
+    "mode": null
+  },
+  "480 Hz, all robot graphs off (physics only)": {
+    "ms_per_frame": 34.27913387616476,
+    "real_time_factor": 0.4862044276519912,
+    "hz": 480,
+    "cameras": false,
+    "lidar": false,
+    "mode": null,
+    "graphs": false
+  },
+  "robot removed (scene only)": {
+    "ms_per_frame": 9.982337554295858,
+    "real_time_factor": 1.6696156161834292,
+    "hz": 480,
+    "cameras": false,
+    "lidar": false,
+    "mode": null,
+    "graphs": false,
+    "robot": false
+  }
+}

@@ -13,37 +13,37 @@
     {
       "check": "robot rests on its rollers (base_footprint z ~ 0, upright)",
       "pass": true,
-      "detail": "z=-0.0029 m tilt=0.11 deg"
+      "detail": "z=-0.0029 m tilt=0.14 deg"
     },
     {
       "check": "arm starts in the init pose (camera looks ahead/down)",
       "pass": true,
-      "detail": "{'joint1': -0.0, 'joint2': 0.007, 'joint3': 1.578, 'joint4': 0.787, 'joint5': 0.0, 'r_joint': -0.0}"
+      "detail": "{'joint1': -0.0, 'joint2': 0.008, 'joint3': 1.578, 'joint4': 0.787, 'joint5': 0.0, 'r_joint': -0.0}"
     },
     {
       "check": "drive: forward 0.2 m/s",
       "pass": true,
-      "detail": "cmd=(0.20, 0.00, 0.00) measured=(0.194, -0.000, -0.001) odom=(np.float64(0.194), np.float64(0.0), np.float64(-0.001))"
+      "detail": "cmd=(0.20, 0.00, 0.00) measured=(0.193, -0.000, -0.002) odom=(np.float64(0.193), np.float64(0.0), np.float64(-0.001))"
     },
     {
       "check": "drive: strafe left 0.2 m/s",
       "pass": true,
-      "detail": "cmd=(0.00, 0.20, 0.00) measured=(-0.000, 0.182, -0.000) odom=(np.float64(-0.0), np.float64(0.182), np.float64(0.004))"
+      "detail": "cmd=(0.00, 0.20, 0.00) measured=(-0.001, 0.177, 0.002) odom=(np.float64(0.0), np.float64(0.177), np.float64(0.006))"
     },
     {
       "check": "drive: rotate 1.0 rad/s",
       "pass": true,
-      "detail": "cmd=(0.00, 0.00, 1.00) measured=(-0.000, -0.000, 0.960) odom=(np.float64(0.0), np.float64(-0.021), np.float64(0.962))"
+      "detail": "cmd=(0.00, 0.00, 1.00) measured=(-0.001, -0.000, 0.941) odom=(np.float64(-0.0), np.float64(-0.02), np.float64(0.944))"
     },
     {
       "check": "drive: diagonal 0.15/0.15",
       "pass": true,
-      "detail": "cmd=(0.15, -0.15, 0.00) measured=(0.145, -0.135, 0.004) odom=(np.float64(0.146), np.float64(-0.134), np.float64(0.003))"
+      "detail": "cmd=(0.15, -0.15, 0.00) measured=(0.144, -0.130, 0.001) odom=(np.float64(0.144), np.float64(-0.13), np.float64(0.003))"
     },
     {
       "check": "arm + gripper follow /joint_command",
       "pass": true,
-      "detail": "max error 0.0042 rad"
+      "detail": "max error 0.0057 rad"
     },
     {
       "check": "gripper mimic joints follow r_joint (4-bar linkage)",
@@ -108,37 +108,37 @@
     {
       "check": "topic /depth_cam/rgb/image_raw",
       "pass": true,
-      "detail": "417 msgs, 14.9 Hz sim time (expected ~15)"
+      "detail": "418 msgs, 15.2 Hz sim time (expected ~15)"
     },
     {
       "check": "topic /depth_cam/rgb/camera_info",
       "pass": true,
-      "detail": "417 msgs, 14.9 Hz sim time"
+      "detail": "418 msgs, 15.2 Hz sim time"
     },
     {
       "check": "topic /depth_cam/depth0/image_raw",
       "pass": true,
-      "detail": "417 msgs, 14.9 Hz sim time (expected ~15)"
+      "detail": "418 msgs, 15.2 Hz sim time (expected ~15)"
     },
     {
       "check": "topic /depth_cam/depth0/camera_info",
       "pass": true,
-      "detail": "417 msgs, 14.9 Hz sim time"
+      "detail": "418 msgs, 15.2 Hz sim time"
     },
     {
       "check": "topic /depth_cam/depth0/points",
       "pass": true,
-      "detail": "417 msgs, 14.9 Hz sim time"
+      "detail": "418 msgs, 15.2 Hz sim time"
     },
     {
       "check": "topic /depth_cam/iro/image_raw",
       "pass": true,
-      "detail": "417 msgs, 14.9 Hz sim time"
+      "detail": "418 msgs, 15.2 Hz sim time"
     },
     {
       "check": "lidar: COIN-D6 400 samples/scan, 0.05-12 m, frame lidar_frame",
       "pass": true,
-      "detail": "{\"frame_id\": \"lidar_frame\", \"n\": 400, \"angle_min\": -3.1415927410125732, \"angle_max\": 3.125884771347046, \"angle_increment\": 0.015707962214946747, \"range_min\": 0.05000000074505806, \"range_max\": 12.0, \"valid\": 250, \"min\": 0.9930792450904846, \"max\": 3.560117483139038}"
+      "detail": "{\"frame_id\": \"lidar_frame\", \"n\": 400, \"angle_min\": -3.1415927410125732, \"angle_max\": 3.125884771347046, \"angle_increment\": 0.015707962214946747, \"range_min\": 0.05000000074505806, \"range_max\": 12.0, \"valid\": 251, \"min\": 0.9866078495979309, \"max\": 3.5755865573883057}"
     },
     {
       "check": "rgb camera 640x400 rgb8, frame depth_cam_frame",
@@ -148,7 +148,7 @@
     {
       "check": "depth image 32FC1, sees the floor, within 0.15-3 m",
       "pass": true,
-      "detail": "{\"encoding\": \"32FC1\", \"valid_fraction\": 1.0, \"min\": 0.26394468545913696, \"max\": 0.6941846013069153}"
+      "detail": "{\"encoding\": \"32FC1\", \"valid_fraction\": 1.0, \"min\": 0.26422107219696045, \"max\": 0.6961559653282166}"
     },
     {
       "check": "camera_info: HFOV ~71 deg (Aurora 930 Pro)",
@@ -158,7 +158,7 @@
     {
       "check": "imu at rest measures gravity ~9.81 along +z",
       "pass": true,
-      "detail": "acc=(0.02, 0.06, 9.80)"
+      "detail": "acc=(0.09, 0.02, 9.81)"
     },
     {
       "check": "/joint_states has the arm + gripper joints",
@@ -217,39 +217,39 @@
       "rate_hz_sim": 60.00000000000341
     },
     "/depth_cam/rgb/image_raw": {
-      "messages": 417,
-      "rate_hz_sim": 14.917127071824053
+      "messages": 418,
+      "rate_hz_sim": 15.248618784531253
     },
     "/depth_cam/rgb/camera_info": {
-      "messages": 417,
-      "rate_hz_sim": 14.917127071824053
+      "messages": 418,
+      "rate_hz_sim": 15.248618784531253
     },
     "/depth_cam/depth0/image_raw": {
-      "messages": 417,
-      "rate_hz_sim": 14.917127071824053
+      "messages": 418,
+      "rate_hz_sim": 15.248618784531253
     },
     "/depth_cam/depth0/camera_info": {
-      "messages": 417,
-      "rate_hz_sim": 14.917127071824053
+      "messages": 418,
+      "rate_hz_sim": 15.248618784531253
     },
     "/depth_cam/depth0/points": {
-      "messages": 417,
-      "rate_hz_sim": 14.917127071824053
+      "messages": 418,
+      "rate_hz_sim": 15.248618784531253
     },
     "/depth_cam/iro/image_raw": {
-      "messages": 417,
-      "rate_hz_sim": 14.917127071824053
+      "messages": 418,
+      "rate_hz_sim": 15.248618784531253
     }
   },
   "phases": {
     "settle": {
       "pos": [
-        -0.0003208369016647339,
-        1.9295017409604043e-05,
-        -0.0028821974992752075
+        -0.0003039231523871422,
+        -4.571586032398045e-06,
+        -0.0029326528310775757
       ],
-      "yaw": 0.00017743915196848073,
-      "tilt_deg": 0.11014342980975618
+      "yaw": -8.430304385443223e-05,
+      "tilt_deg": 0.14401765375946743
     },
     "forward 0.2 m/s": {
       "cmd": [
@@ -258,16 +258,16 @@
         0.0
       ],
       "measured_body_vel": [
-        "0.19403002",
-        "-0.00012284204",
-        -0.0005914025341169841
+        "0.19256204",
+        "-0.00029923295",
+        -0.0018034663813371616
       ],
       "odom_twist": [
-        0.1941678298382099,
-        0.0003336427297954026,
-        -0.00091009781789824
+        0.19271960481587597,
+        0.0004318833752734014,
+        -0.001144054561090599
       ],
-      "tilt_deg": 0.18871159039859822
+      "tilt_deg": 0.15701751249847418
     },
     "strafe left 0.2 m/s": {
       "cmd": [
@@ -276,16 +276,16 @@
         0.0
       ],
       "measured_body_vel": [
-        "-0.0002133185",
-        "0.18223983",
-        -0.00018907221123444848
+        "-0.0006792546",
+        "0.17692594",
+        0.0021172880403874006
       ],
       "odom_twist": [
-        -0.00046830120994412747,
-        0.18195074444043138,
-        0.004271408915519715
+        8.579366033439344e-05,
+        0.17661406317974432,
+        0.005777170242719068
       ],
-      "tilt_deg": 0.07912937001338383
+      "tilt_deg": 0.06852804325551864
     },
     "rotate 1.0 rad/s": {
       "cmd": [
@@ -294,16 +294,16 @@
         1.0
       ],
       "measured_body_vel": [
-        "-0.00042441033",
-        "-7.55369e-05",
-        0.9596320664015586
+        "-0.0007436609",
+        "-3.0242372e-06",
+        0.9411697659503432
       ],
       "odom_twist": [
-        0.00015096946039625455,
-        -0.020999045406408783,
-        0.9617220252752304
+        -0.00010601823347197332,
+        -0.02024728822022361,
+        0.9440026823017332
       ],
-      "tilt_deg": 0.09278741380920028
+      "tilt_deg": 0.145369962588823
     },
     "diagonal 0.15/0.15": {
       "cmd": [
@@ -312,16 +312,16 @@
         0.0
       ],
       "measured_body_vel": [
-        "0.14530422",
-        "-0.13474838",
-        0.003680950973357606
+        "0.14382562",
+        "-0.13018338",
+        0.0012574423336541556
       ],
       "odom_twist": [
-        0.14569827383372164,
-        -0.13436492085318635,
-        0.0025317648216906436
+        0.14407659468020964,
+        -0.13020540909437403,
+        0.0026388841517815025
       ],
-      "tilt_deg": 0.06561060592844098
+      "tilt_deg": 0.11014342980975618
     },
     "arm": {
       "target": {
@@ -333,17 +333,17 @@
         "r_joint": 0.5
       },
       "reached": {
-        "joint1": 0.5000075101852417,
-        "joint2": -0.6000651717185974,
-        "joint3": 0.8041537404060364,
-        "joint4": 0.6018054485321045,
-        "joint5": -0.40004798769950867,
-        "r_joint": 0.5002138018608093,
-        "l_joint": 0.5002158880233765,
-        "l_in_joint": -0.5002222657203674,
-        "l_out_joint": 0.5002251267433167,
-        "r_in_joint": 0.5002390742301941,
-        "r_out_joint": -0.5002361536026001
+        "joint1": 0.5000149011611938,
+        "joint2": -0.5997692346572876,
+        "joint3": 0.8056982159614563,
+        "joint4": 0.6018350124359131,
+        "joint5": -0.40010398626327515,
+        "r_joint": 0.5002110004425049,
+        "l_joint": 0.5002128481864929,
+        "l_in_joint": -0.5001992583274841,
+        "l_out_joint": 0.5002220869064331,
+        "r_in_joint": 0.5002516508102417,
+        "r_out_joint": -0.5002371668815613
       }
     }
   },
@@ -359,15 +359,15 @@
     "angle_increment": 0.015707962214946747,
     "range_min": 0.05000000074505806,
     "range_max": 12.0,
-    "valid": 250,
-    "min": 0.9930792450904846,
-    "max": 3.560117483139038
+    "valid": 251,
+    "min": 0.9866078495979309,
+    "max": 3.5755865573883057
   },
   "depth": {
     "encoding": "32FC1",
     "valid_fraction": 1.0,
-    "min": 0.26394468545913696,
-    "max": 0.6941846013069153
+    "min": 0.26422107219696045,
+    "max": 0.6961559653282166
   },
   "camera_info": {
     "k": [
@@ -387,11 +387,11 @@
   "imu": {
     "frame_id": "imu_link",
     "acc": [
-      0.024565264582633972,
-      0.05900467932224274,
-      9.801700592041016
+      0.09362570941448212,
+      0.02014944702386856,
+      9.810296058654785
     ],
-    "|g|": 9.801908972257554
+    "|g|": 9.810763504036592
   },
   "tf_pairs": [
     "base_footprint -> base_link",

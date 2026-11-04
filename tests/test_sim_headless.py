@@ -31,6 +31,11 @@ import omni.kit.app
 em = omni.kit.app.get_app().get_extension_manager()
 em.set_extension_enabled_immediate("isaacsim.ros2.bridge", True)
 app.update()
+sys.path.insert(0, os.path.join(REPO, "launch"))
+if "--no-fabric" not in sys.argv:
+    import rosorin_runtime as _rt
+
+    _rt.enable_fabric()  # same configuration as the launchers
 
 import numpy as np
 import omni.timeline

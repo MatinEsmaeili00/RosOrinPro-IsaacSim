@@ -1,0 +1,24 @@
+{
+  "checks": [
+    {
+      "check": "twin: simulated arm/gripper follow the real /joint_states",
+      "pass": true,
+      "detail": "max error 0.018 rad {'joint1': (0.065, 0.047), 'joint2': (-0.3, -0.295), 'joint3': (1.2, 1.208), 'joint4': (0.6, 0.603), 'joint5': (0.3, 0.3), 'r_joint': (0.4, 0.4)}"
+    },
+    {
+      "check": "twin: simulated base follows the real /odom (circle)",
+      "pass": true,
+      "detail": "pos err 0.004 m, yaw err 0.014 rad (real at 0.45, 0.71)"
+    },
+    {
+      "check": "battery: /ros_robot_controller/battery (UInt16 mV) at ~1 Hz",
+      "pass": true,
+      "detail": "8 msgs: [12269, 12150, 12030, 11912, 11798, 11679, 11561, 11444]"
+    },
+    {
+      "check": "battery: plausible 3S voltage that drains",
+      "pass": true,
+      "detail": "[12269] -> [11444] mV"
+    }
+  ]
+}

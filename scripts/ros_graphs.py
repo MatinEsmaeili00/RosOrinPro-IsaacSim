@@ -220,15 +220,18 @@ def build_lidar_graph(path, lidar_prim, frame_id, topics):
         n = "LaserScan%d" % i
         nodes.append((n, "isaacsim.ros2.bridge.ROS2RtxLidarHelper"))
         values += [(n + ".inputs:topicName", topic), (n + ".inputs:type", "laser_scan"),
-                   (n + ".inputs:frameId", frame_id), (n + ".inputs:fullScan", True)]
+                   (n + ".inputs:frameId", frame_id)]
         connects += [("LidarRenderProduct.outputs:execOut", n + ".inputs:execIn"),
                      ("LidarRenderProduct.outputs:renderProductPath", n + ".inputs:renderProductPath"),
                      ("Context.outputs:context", n + ".inputs:context")]
     return _graph(path, nodes, values, connects)
 
 
-def build_camera_graph(path, rgb_camera, depth_camera, width, height, frame_id, frame_skip, topics):
-    """Aurora 930 Pro: RGB, depth (32FC1, metres), registered point cloud, IR stand-in, camera_info."""
+def build_camera_graph(path, rgb_camera, depth_camera, width, height, frame_id, topics):
+    """Aurora 930 Pro: RGB, depth (32FC1, metres), registered point cloud, IR stand-in, camera_info.
+
+    The publish rate comes from omni:sensor:tickRate on the camera prims (Isaac Sim 6.2; frameSkipCount is
+    deprecated)."""
     nodes = [TICK, CTX, RUNONCE,
              ("RgbRenderProduct", "isaacsim.core.nodes.IsaacCreateRenderProduct"),
              ("DepthRenderProduct", "isaacsim.core.nodes.IsaacCreateRenderProduct")]
@@ -250,7 +253,6 @@ def build_camera_graph(path, rgb_camera, depth_camera, width, height, frame_id, 
     for name, ntype, rp, topic, htype in helpers:
         nodes.append((name, ntype))
         values += [(name + ".inputs:topicName", topic), (name + ".inputs:frameId", frame_id),
-                   (name + ".inputs:frameSkipCount", int(frame_skip)),
                    (name + ".inputs:resetSimulationTimeOnStop", True)]
         if htype:
             values.append((name + ".inputs:type", htype))

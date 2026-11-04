@@ -86,9 +86,10 @@ init_pose:
   r_joint: 0.0
 
 physics:
-  # tuned with tests/tune_mecanum.py (docs/DECISIONS.md): compliant rubber rollers + 480 Hz gave the best
-  # tracking (forward 97 %, strafe 90 %, rotate 96 % of command) and the least wheel jitter.
-  steps_per_second: 480
+  # tuned with tests/tune_mecanum.py (docs/DECISIONS.md): compliant rubber rollers. 240 Hz tracks forward 96 %,
+  # strafe 88 %, rotate 95 % of the command; 480 Hz is ~2 points better but costs ~6 ms per frame.
+  # Set 480 for maximum fidelity (then re-run launch/build_all.bat or scripts/build_scene.py).
+  steps_per_second: 240
   solver_position_iterations: 32
   solver_velocity_iterations: 4
   ground_static_friction: 0.9
@@ -128,3 +129,6 @@ battery:
   capacity_mah: 6000
   idle_current_a: 1.2       # Jetson + sensors (estimate)
   drive_current_a_per_mps: 3.0
+  internal_resistance_ohm: 0.05
+  initial_soc: 0.95         # state of charge when the simulation starts
+  time_scale: 1.0           # >1 drains the battery faster (e.g. 60 to test low-battery behaviour)

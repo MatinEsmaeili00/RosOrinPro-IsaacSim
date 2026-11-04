@@ -418,6 +418,7 @@ def main():
                      ("exposure:responsivity", 1.1026709)):
             set_attr(cp, n, v, Sdf.ValueTypeNames.Float)
         set_attr(cp, "omni:rtx:autoExposure:enabled", True, Sdf.ValueTypeNames.Bool)
+        set_attr(cp, "omni:sensor:tickRate", float(cc["fps"]), Sdf.ValueTypeNames.Float)  # 15 fps like the Aurora
         CAMS[cname] = str(cam.GetPath())
     REPORT["camera"] = {"focal_length": focal, "h_aperture": h_ap, "v_aperture": v_ap,
                         "hfov_deg": cc["hfov_deg"], "vfov_deg": math.degrees(2 * math.atan(v_ap / (2 * focal)))}
@@ -469,10 +470,9 @@ def main():
             odom_topics=["odom", "odom_raw"],
             imu_topics=[("imu", True), ("imu_corrected", False), ("ros_robot_controller/imu_raw", False)])
         ros_graphs.build_lidar_graph(str(gscope.AppendChild("Lidar")), LIDAR_PATH, lc["frame_id"], ["scan", "scan_raw"])
-        frame_skip = max(0, int(round(60.0 / cc["fps"])) - 1)
         ros_graphs.build_camera_graph(
             str(gscope.AppendChild("DepthCamera")), CAMS["rgb_camera"], CAMS["depth_camera"], cc["width"], cc["height"],
-            cc["frame_id"], frame_skip,
+            cc["frame_id"],
             {"rgb": "depth_cam/rgb/image_raw", "rgb_info": "depth_cam/rgb/camera_info",
              "depth": "depth_cam/depth0/image_raw", "depth_info": "depth_cam/depth0/camera_info",
              "points": "depth_cam/depth0/points", "ir": "depth_cam/iro/image_raw"})

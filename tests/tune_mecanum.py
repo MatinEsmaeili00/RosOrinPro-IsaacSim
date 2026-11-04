@@ -11,6 +11,7 @@ import json
 import math
 import os
 import sys
+import time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ap = argparse.ArgumentParser()
@@ -41,7 +42,7 @@ stage = ctx.get_stage()
 blocks = stage.GetPrimAtPath("/World/TestArena/Blocks")  # keep the driving area clear
 if blocks:
     blocks.SetActive(False)
-for g in ("MecanumDrive", "DepthCamera", "Lidar"):
+for g in ("MecanumDrive", "DepthCamera", "Lidar", "RobotState", "ArmGripper"):
     p = stage.GetPrimAtPath("/World/rosorin_pro/Graphs/" + g)
     if p:
         p.SetActive(False)
@@ -71,6 +72,12 @@ VARIANTS = {
     "J_C_480hz": dict(compliant_k=8.0e3, compliant_c=100.0, hz=480),
     "K_C_damped": dict(compliant_k=8.0e3, compliant_c=200.0),
     "L_C_mu12": dict(compliant_k=8.0e3, compliant_c=100.0, mu=1.2),
+    # performance: fewer articulation solver iterations / lower rate (docs/DECISIONS.md, "Performance")
+    "M_J_pos16": dict(compliant_k=8.0e3, compliant_c=100.0, hz=480, pos_iter=16),
+    "N_J_pos8": dict(compliant_k=8.0e3, compliant_c=100.0, hz=480, pos_iter=8),
+    "O_C_pos8": dict(compliant_k=8.0e3, compliant_c=100.0, hz=240, pos_iter=8),
+    "P_360_pos8": dict(compliant_k=8.0e3, compliant_c=100.0, hz=360, pos_iter=8),
+    "Q_C_pos4": dict(compliant_k=8.0e3, compliant_c=100.0, hz=240, pos_iter=4),
 }
 if args.variants:
     VARIANTS = {k: v for k, v in VARIANTS.items() if k.split("_")[0] in args.variants.split(",")}
@@ -142,13 +149,16 @@ for name, over in VARIANTS.items():
     for _ in range(60):
         app.update()
     res = {}
+    frame_ms = []
     for test, cmd in (("forward", (0.2, 0, 0)), ("strafe", (0, 0.2, 0)), ("rotate", (0, 0, 1.0)),
                       ("diagonal", (0.14, 0.14, 0))):
         tgt = ik(*cmd)
         samples, wheel_dev, tilts, zs = [], [], [], []
         for i in range(150):
             art.set_dof_velocity_targets(tgt[None, :], dof_indices=wi)
+            _t = time.time()
             app.update()
+            frame_ms.append((time.time() - _t) * 1000)
             if i >= 30:
                 lin, ang = art.get_velocities()
                 lin, ang = lin.numpy()[0], ang.numpy()[0]
@@ -173,8 +183,8 @@ for name, over in VARIANTS.items():
     for t, r in res.items():
         cmd = np.array(r["cmd"])
         err += float(np.abs(np.array(r["mean"]) - cmd).sum() + np.array(r["std"]).sum())
-    RESULTS[name] = {"params": p, "tests": res, "score": err}
-    print("VARIANT %-24s score=%.3f " % (name, err) + " | ".join(
+    RESULTS[name] = {"params": p, "tests": res, "score": err, "ms_per_frame": float(np.median(frame_ms))}
+    print("VARIANT %-24s score=%.3f %.1f ms/frame " % (name, err, float(np.median(frame_ms))) + " | ".join(
         "%s mean=%s std=%s wdev95=%.2f tilt=%.1f z=%s" % (t, r["mean"], r["std"], r["wheel_p95_dev"], r["max_tilt_deg"], np.round(r["z_range"], 3).tolist()) for t, r in res.items()), flush=True)
 
 os.makedirs(os.path.dirname(args.out), exist_ok=True)
