@@ -52,7 +52,7 @@ harmonics degree 3, 946 MB.
 ### Phase 3: Nav2 in the existing test arena (known geometry)
 * ✅ First live run (SLAM + Nav2 against the headless arena simulation): goal 1 m ahead **SUCCEEDED**,
   0.95 m driven in 4.5 s sim time, final error 0.14 m.
-* ✅ Automated test `launchun_nav2_test.bat` (`tests/test_nav2.py`): starts the simulation and Nav2,
+* ✅ Automated test `launch\run_nav2_test.bat` (`tests/test_nav2.py`): starts the simulation and Nav2,
   runs a tour, stops everything, writes `tests/results/report_nav2_<world>.json`.
 * ✅ Arena map from the arena's colliders (`scripts/build_usd_map.py` → `maps/test_arena.{pgm,yaml}`).
 * 🔄 Arena test runs (AMCL tour, SLAM tour).
@@ -61,7 +61,7 @@ harmonics degree 3, 946 MB.
 * ✅ Analyse the PLY (orientation, scale, extent).
 * ✅ Convert the PLY to USD with Isaac Sim's converter (`omni.kit.converter.gsplat`, half precision):
   3.94 M Gaussians after cropping, `usd/splat/building.usd` (512 MB, not in git, rebuilt by
-  `launchuild_splat_world.bat`). It renders in RTX: see `docs/images/splat/hall_view.png`.
+  `launch\build_splat_world.bat`). It renders in RTX: see `docs/images/splat/hall_view.png`.
 * ✅ Occupancy grid from the Gaussians (`scripts/splat_occupancy.py`): floor layer = free, robot-height band =
   obstacles, ring around the scanned floor = walls. 166 m² free.
 * ✅ Nav2 map `nav2/rosorin_nav2/maps/splat_building.{pgm,yaml}` + preview `docs/images/splat_map.png`.
