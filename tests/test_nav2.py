@@ -133,12 +133,15 @@ def main():
                    "world:=" + args.world, "slam:=" + str(args.slam), "rviz:=" + str(args.rviz)]
         print("[test_nav2] starting Nav2:", " ".join(nav_cmd[3:]), flush=True)
         nav = start(nav_cmd, logs["nav2"], NAV2)
-        if not wait_for_log(logs["nav2"], ["Managed nodes are active"], nav, 300):
+        hit = wait_for_log(logs["nav2"], ["Managed nodes are active", "Aborting bringup"], nav, 300)
+        if hit == "Aborting bringup":
+            raise RuntimeError("Nav2 bringup aborted (see %s)" % logs["nav2"])
+        if hit is None:
             print("[test_nav2] (no 'Managed nodes are active' line yet, the goal tool waits for Nav2 itself)",
                   flush=True)
 
         goal_cmd = [pixi, "run", "--frozen", "ros2", "run", "rosorin_nav2", "goal", "--world", args.world,
-                    "--timeout", str(args.goal_timeout), "--json", goal_json]
+                    "--timeout", str(args.goal_timeout), "--json", goal_json, "--ground-truth"]
         goal_cmd += sum((["--place", p] for p in args.place), []) if args.place else ["--tour"]
         print("[test_nav2] sending goals ...", flush=True)
         with open(logs["goal"], "w", encoding="utf-8") as glog:
@@ -164,6 +167,8 @@ def main():
             "goals": len(goals),
             "distance_m": round(sum(gl.get("distance_m", 0.0) for gl in goals), 2),
             "sim_time_s": round(sum(gl.get("sim_time_s", 0.0) for gl in goals), 1),
+            "max_true_position_error_m": max((gl.get("true_position_error_m", 0.0) for gl in goals), default=None),
+            "max_localization_error_m": max((gl.get("localization_error_m", 0.0) for gl in goals), default=None),
         }
         with open(report_path, "w", encoding="utf-8") as f:
             json.dump(report, f, indent=2)

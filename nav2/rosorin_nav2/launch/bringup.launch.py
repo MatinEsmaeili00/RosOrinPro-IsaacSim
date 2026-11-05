@@ -43,6 +43,8 @@ def _setup(context):
         raise RuntimeError("unknown world %r, choose one of %s" % (world, sorted(worlds)))
     w = worlds[world]
     map_yaml = map_arg or os.path.join(share, "maps", w["map"])
+    # nav2_bringup's RewrittenYaml drops backslashes (Windows paths): pass forward slashes, Windows accepts them
+    map_yaml = map_yaml.replace("\\", "/")
     pose = [float(v) for v in pose_arg.replace(",", " ").split()] if pose_arg else [float(v) for v in w["spawn"]]
     if len(pose) != 3:
         raise RuntimeError("initial_pose must be 'x y yaw_deg', got %r" % pose_arg)

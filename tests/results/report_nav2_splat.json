@@ -1,0 +1,113 @@
+{
+  "world": "splat",
+  "slam": false,
+  "scene": "scenes/splat_world.usd",
+  "date": "2026-11-05 13:22",
+  "ok": true,
+  "sim_start_s": 38.8,
+  "goals": [
+    {
+      "status": "SUCCEEDED",
+      "sim_time_s": 41.2,
+      "wall_time_s": 61.8,
+      "distance_m": 11.515,
+      "final_pose": [
+        -1.246,
+        4.815,
+        171.0
+      ],
+      "position_error_m": 0.03,
+      "yaw_error_deg": 9.0,
+      "name": "conference_room",
+      "target": [
+        -1.22,
+        4.83,
+        180.0
+      ]
+    },
+    {
+      "status": "SUCCEEDED",
+      "sim_time_s": 61.67,
+      "wall_time_s": 92.64,
+      "distance_m": 17.989,
+      "final_pose": [
+        7.217,
+        12.619,
+        65.3
+      ],
+      "position_error_m": 0.111,
+      "yaw_error_deg": 4.7,
+      "name": "north_hall",
+      "target": [
+        7.23,
+        12.73,
+        70.0
+      ]
+    },
+    {
+      "status": "SUCCEEDED",
+      "sim_time_s": 58.13,
+      "wall_time_s": 86.81,
+      "distance_m": 15.739,
+      "final_pose": [
+        7.281,
+        0.214,
+        -6.0
+      ],
+      "position_error_m": 0.119,
+      "yaw_error_deg": 6.0,
+      "name": "east_lounge",
+      "target": [
+        7.38,
+        0.28,
+        0.0
+      ]
+    },
+    {
+      "status": "SUCCEEDED",
+      "sim_time_s": 38.95,
+      "wall_time_s": 58.48,
+      "distance_m": 10.386,
+      "final_pose": [
+        -1.517,
+        -5.06,
+        -119.5
+      ],
+      "position_error_m": 0.016,
+      "yaw_error_deg": 9.5,
+      "name": "south_hall",
+      "target": [
+        -1.53,
+        -5.07,
+        -110.0
+      ]
+    },
+    {
+      "status": "SUCCEEDED",
+      "sim_time_s": 26.28,
+      "wall_time_s": 39.58,
+      "distance_m": 7.141,
+      "final_pose": [
+        2.972,
+        0.011,
+        57.4
+      ],
+      "position_error_m": 0.109,
+      "yaw_error_deg": 12.6,
+      "name": "hall",
+      "target": [
+        2.98,
+        0.12,
+        70.0
+      ]
+    }
+  ],
+  "goal_exit_code": 0,
+  "wall_s": 423.6,
+  "summary": {
+    "succeeded": 5,
+    "goals": 5,
+    "distance_m": 62.77,
+    "sim_time_s": 226.2
+  }
+}

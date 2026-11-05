@@ -52,10 +52,10 @@ harmonics degree 3, 946 MB.
 ### Phase 3: Nav2 in the existing test arena (known geometry)
 * ✅ First live run (SLAM + Nav2 against the headless arena simulation): goal 1 m ahead **SUCCEEDED**,
   0.95 m driven in 4.5 s sim time, final error 0.14 m.
-* 🔄 Automated test (`tests/test_nav2.py`): starts the simulation and Nav2, runs a tour, writes
-  `tests/results/report_nav2_*.json`. (The first tour attempt stopped because the headless run had
-  `--duration 400` and the simulation ended. Not a Nav2 problem.)
-* ⬜ Occupancy map of the test arena (from the PhysX colliders) for AMCL.
+* ✅ Automated test `launchun_nav2_test.bat` (`tests/test_nav2.py`): starts the simulation and Nav2,
+  runs a tour, stops everything, writes `tests/results/report_nav2_<world>.json`.
+* ✅ Arena map from the arena's colliders (`scripts/build_usd_map.py` → `maps/test_arena.{pgm,yaml}`).
+* 🔄 Arena test runs (AMCL tour, SLAM tour).
 
 ### Phase 4: the splat environment
 * ✅ Analyse the PLY (orientation, scale, extent).
@@ -74,10 +74,15 @@ harmonics degree 3, 946 MB.
   (`tests/results/splat_build_report.json`). The lab is not reachable (its doorway is too narrow in the scan).
 
 ### Phase 5: Nav2 through the splat building
-* ⬜ Navigate between rooms (several goals or waypoints), with results and pictures.
+* ✅ **Tour of the building with AMCL on the generated map: 5/5 goals SUCCEEDED**, 62.8 m driven in
+  226 s simulation time (424 s wall), final errors 0.02–0.12 m and 5–13°, no recovery behaviour needed
+  (`tests/results/report_nav2_splat.json`).
+* 🔄 Second run with ground truth (true position error and AMCL localization error from the exact
+  simulated `/odom`).
 
 ### Phase 6: documentation
-* ⬜ `docs/NAV2.md` (how to run), `docs/SPLAT_ENVIRONMENT.md` (how the scene is made).
+* ✅ `docs/NAV2.md` (how to run, parameters, real robot, troubleshooting).
+* ✅ `docs/SPLAT_ENVIRONMENT.md` (how the scene is made, the proxy tests, using your own splat).
 * ⬜ Additions to README, TESTING and WORKLOG (new sections only, nothing removed).
 
 ## Log
@@ -97,4 +102,6 @@ harmonics degree 3, 946 MB.
      bands, `docs/images/splat/hall_view_full_height_proxy.png`); adding `doNotCastShadows` removes the bands
      but also hides it from the lidar; switching off light shadows does not help.
      Solution: invisible full-height collision boxes + a 6.5 cm camera-hidden strip around the beam height.
-
+* **2026-11-05:** first splat tour failed before driving: nav2_bringup's `RewrittenYaml` drops the
+  backslashes of a Windows map path (`C:isaac-sim-standalone-6.2.0RosOrinPro...`). The launch file now passes
+  forward slashes. The test harness now stops at once when Nav2's bringup aborts. Second run: **5/5 goals**.

@@ -6,7 +6,9 @@
     ros2 run rosorin_nav2 goal --world arena --tour --json result.json
 
 For each goal it prints the Nav2 result, the time taken (simulation time when use_sim_time is on), the
-distance driven (from /odom) and the final position error (from TF map -> base_footprint).
+distance driven (from /odom) and the final position error (from TF map -> base_footprint). In the simulator,
+--ground-truth also reports the true position error and AMCL's localization error (the simulated /odom is
+exact and starts at the world's spawn pose).
 Exit code 0 when every goal succeeded.
 """
 
@@ -56,6 +58,8 @@ class GoalClient(Node):
         self.tf_listener = TransformListener(self.tf, self)
         self.odom_dist = 0.0
         self._last_xy = None
+        self.odom_pose = None  # (x, y, yaw) in the odom frame
+        self.truth_spawn = None  # simulation only: world pose where /odom started (see --ground-truth)
         self.create_subscription(Odometry, "odom", self._odom, 20)
 
     def _odom(self, msg):
@@ -63,6 +67,16 @@ class GoalClient(Node):
         if self._last_xy is not None:
             self.odom_dist += math.hypot(p.x - self._last_xy[0], p.y - self._last_xy[1])
         self._last_xy = (p.x, p.y)
+        self.odom_pose = (p.x, p.y, quat_to_yaw(msg.pose.pose.orientation))
+
+    def true_pose(self):
+        """World pose from the simulator's exact /odom and the spawn pose (None outside --ground-truth)."""
+        if self.truth_spawn is None or self.odom_pose is None:
+            return None
+        sx, sy, syaw = self.truth_spawn
+        ox, oy, oyaw = self.odom_pose
+        c, s = math.cos(syaw), math.sin(syaw)
+        return sx + c * ox - s * oy, sy + s * ox + c * oy, wrap(syaw + oyaw)
 
     def spin_for(self, seconds):
         end = time.monotonic() + seconds
@@ -133,6 +147,13 @@ class GoalClient(Node):
             out["final_pose"] = [round(p[0], 3), round(p[1], 3), round(math.degrees(p[2]), 1)]
             out["position_error_m"] = round(math.hypot(x - p[0], y - p[1]), 3)
             out["yaw_error_deg"] = round(math.degrees(abs(wrap(math.radians(yaw_deg) - p[2]))), 1)
+        t = self.true_pose()
+        if t:
+            out["true_pose"] = [round(t[0], 3), round(t[1], 3), round(math.degrees(t[2]), 1)]
+            out["true_position_error_m"] = round(math.hypot(x - t[0], y - t[1]), 3)
+            if p:
+                out["localization_error_m"] = round(math.hypot(p[0] - t[0], p[1] - t[1]), 3)
+                out["localization_yaw_error_deg"] = round(math.degrees(abs(wrap(p[2] - t[2]))), 1)
         return out
 
 
@@ -146,6 +167,9 @@ def main(argv=None):
     ap.add_argument("--ready-timeout", type=float, default=180.0, help="seconds to wait for Nav2 + localization")
     ap.add_argument("--use-sim-time", default="true", help="true (simulator) or false (real robot)")
     ap.add_argument("--json", default="", help="write the results to this file")
+    ap.add_argument("--ground-truth", action="store_true",
+                    help="simulation only: /odom is exact and starts at the world's spawn pose, so also report the "
+                         "true position error and AMCL's localization error")
     args = ap.parse_args(rclpy.utilities.remove_ros_args(argv if argv is not None else sys.argv)[1:])
 
     with open(os.path.join(get_package_share_directory("rosorin_nav2"), "config", "worlds.yaml"),
@@ -170,6 +194,11 @@ def main(argv=None):
 
     rclpy.init(args=argv)
     node = GoalClient(args.use_sim_time.strip().lower() in ("1", "true", "yes"))
+    if args.ground_truth:
+        if args.world not in worlds:
+            ap.error("--ground-truth needs --world (have %s)" % sorted(worlds))
+        sx, sy, syaw = (float(v) for v in worlds[args.world]["spawn"])
+        node.truth_spawn = (sx, sy, math.radians(syaw))
     results = []
     try:
         print("[goal] waiting for Nav2 and localization (map -> base_footprint) ...", flush=True)
