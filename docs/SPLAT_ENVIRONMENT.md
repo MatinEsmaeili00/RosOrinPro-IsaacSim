@@ -8,6 +8,10 @@ that way (every choice was tested), and how to use your own splat.
 |---|---|---|---|
 | ![](images/splat/hall_view.png) | ![](images/splat/robot_camera_rgb.png) | ![](images/splat/lidar_scan.png) | ![](images/splat_map.png) |
 
+![The ROSOrin Pro in the hall of the splat building](images/splat/robot_in_hall.png)
+
+Images: `tools/render_splat_docs.py` (views) and `ros2_tools/sensor_snapshot.py` (the robot's sensors).
+
 ## Build it
 
 ```bat

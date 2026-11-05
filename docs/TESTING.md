@@ -10,6 +10,7 @@ PC (Isaac Sim 6.2.0, RTX A6000) on 2026-11-03.
 | 3 | [Do the sensors look right?](#3-do-the-sensors-look-right) | 10 s | `6 / 6 sensors OK`, three pictures |
 | 4 | [Drive it and move the arm](#4-drive-it-and-move-the-arm) | 2 min | robot moves as commanded, arm and gripper follow |
 | 5 | [Automated test](#5-automated-test) | 2 min | `TEST DONE passed=35 failed=0` |
+| 6 | [Navigation with Nav2](#6-navigation-with-nav2-added-5-november-2026) (new) | 8 min | `[test_nav2] PASS: 5/5 goals` |
 
 **Before you start:** the repository must sit inside the Isaac Sim folder
 (`C:\isaac-sim-standalone-6.2.0\RosOrinPro-IsaacSim`), because the launchers and your scene find Isaac Sim
@@ -185,6 +186,50 @@ Two more tests, each about 2 minutes:
 |---|---|---|
 | `launch\run_python.bat tests\test_pick.py` | picks up a 3 cm block, lifts and carries it | `passed=3 failed=0` |
 | `launch\run_python.bat tests\test_twin_battery.py` | twin mode follows a fake robot on ROS domain 42; battery topic; `/robot_description` | `passed=5 failed=0` |
+
+## 6. Navigation with Nav2 (added 5 November 2026)
+
+Needs the Nav2 environment once (`cd nav2`, `pixi install`, `pixi run build`, see [NAV2.md](NAV2.md)) and,
+for the splat building, `scenes\splat_world.usd` (in git) plus the converted splat
+`usd\splat\building.usd` (not in git: `launch\build_splat_world.bat` makes it from `..\Splats\`).
+
+**6a. Sensors in the splat building.** Start `launch\run_isaacsim.bat scenes\splat_world.usd`, press Play,
+then run `ros2_tools\run.bat ros2_tools\sensor_snapshot.py`:
+
+```
+PASS camera   640x400 rgb8, mean 67, contrast (std) 24.6 -> rgb.png
+PASS depth    32FC1, 99 % pixels valid, range 0.22-1.38 m -> depth.png
+PASS lidar    400 beams, 237 valid, nearest 1.58 m -> scan.png (drawn in base_link; lidar_frame yaw 180 deg)
+PASS imu      |acceleration| = 9.81 m/s^2 (gravity 9.81 when standing still)
+PASS joints   51 joints, arm = [0.00, 0.01, 1.58, 0.79, 0.00], gripper r_joint = -0.00
+PASS battery  12.40 V
+```
+
+The camera sees the carpet, and the lidar sees the walls of the hall on both sides (pictures in
+[images/splat/](images/splat/)).
+
+**6b. Drive to a place by hand.** With the simulation playing, in a second terminal run `cd nav2` and
+`pixi run nav world:=splat`. RViz opens with the map and the robot in the hall. Click **Nav2 Goal** and drag
+an arrow somewhere in the white area, or in a third terminal run `pixi run goal --world splat --place
+conference_room`. Expected: `"status": "SUCCEEDED"` after about 40 s of simulation time (about 1 minute).
+
+**6c. Automated tour** (close Isaac Sim first, as for test 5):
+
+```bat
+launch\run_nav2_test.bat                         :: splat building, AMCL, 5 places, ~8 min
+launch\run_nav2_test.bat --world arena           :: test arena, AMCL, 4 places, ~4 min
+launch\run_nav2_test.bat --world arena --slam    :: test arena, mapping with slam_toolbox
+```
+
+Last line for the splat building (2026-11-05):
+
+```
+[test_nav2] PASS: 5/5 goals, 62.6 m driven, 226 s sim time, 456 s wall -> tests\results\report_nav2_splat.json
+```
+
+The report lists each goal with its time, distance, final error, and (simulation only) the true position
+error and AMCL's localization error. Measured: true error 4–11 cm, localization error 2–10 cm. The logs of
+the simulator, Nav2 and the goal tool are next to the report (`tests\results\nav2_<world>_*.log`).
 
 ## From another computer (Linux, Jetson, WSL)
 
