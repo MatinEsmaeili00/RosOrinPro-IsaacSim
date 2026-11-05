@@ -55,7 +55,12 @@ harmonics degree 3, 946 MB.
 * ✅ Automated test `launch\run_nav2_test.bat` (`tests/test_nav2.py`): starts the simulation and Nav2,
   runs a tour, stops everything, writes `tests/results/report_nav2_<world>.json`.
 * ✅ Arena map from the arena's colliders (`scripts/build_usd_map.py` → `maps/test_arena.{pgm,yaml}`).
-* 🔄 Arena test runs (AMCL tour, SLAM tour).
+* ✅ **Arena, AMCL: 4/4 goals**, true final error 4–8 cm, AMCL localization error 5–7 cm
+  (`tests/results/report_nav2_arena.json`).
+* ⚠️ **Arena, SLAM: 3/4 goals.** slam_toolbox's pose drifted to 0.77 m / 28° from ground truth on the third
+  leg and that goal aborted (`report_nav2_arena_slam.json`). The simulated odometry is exact, so this is
+  scan matching in a small, square room with the lidar's blind sectors. 🔄 Tuning the slam_toolbox
+  parameters.
 
 ### Phase 4: the splat environment
 * ✅ Analyse the PLY (orientation, scale, extent).
@@ -74,16 +79,24 @@ harmonics degree 3, 946 MB.
   (`tests/results/splat_build_report.json`). The lab is not reachable (its doorway is too narrow in the scan).
 
 ### Phase 5: Nav2 through the splat building
-* ✅ **Tour of the building with AMCL on the generated map: 5/5 goals SUCCEEDED**, 62.8 m driven in
-  226 s simulation time (424 s wall), final errors 0.02–0.12 m and 5–13°, no recovery behaviour needed
-  (`tests/results/report_nav2_splat.json`).
-* 🔄 Second run with ground truth (true position error and AMCL localization error from the exact
-  simulated `/odom`).
+* ✅ **Tour of the building with AMCL on the generated map: 5/5 goals SUCCEEDED** (twice, identical:
+  62.6–62.8 m driven in 226 s simulation time, ~7.5 min wall), no recovery behaviour needed.
+* ✅ Checked against ground truth (the simulated `/odom` is exact): true final position error **4–11 cm**,
+  AMCL localization error **2–10 cm** and ≤ 1.1° (`tests/results/report_nav2_splat.json`).
+
+| Leg | Distance | Sim time | True error | AMCL error |
+|---|---|---|---|---|
+| hall → conference_room | 11.5 m | 41 s | 0.04 m | 0.02 m |
+| → north_hall | 17.9 m | 61 s | 0.08 m | 0.03 m |
+| → east_lounge | 15.8 m | 58 s | 0.08 m | 0.10 m |
+| → south_hall | 10.4 m | 39 s | 0.11 m | 0.09 m |
+| → hall | 7.2 m | 27 s | 0.06 m | 0.05 m |
 
 ### Phase 6: documentation
 * ✅ `docs/NAV2.md` (how to run, parameters, real robot, troubleshooting).
 * ✅ `docs/SPLAT_ENVIRONMENT.md` (how the scene is made, the proxy tests, using your own splat).
-* ⬜ Additions to README, TESTING and WORKLOG (new sections only, nothing removed).
+* ✅ README: new sections and rows only (54 lines added, none removed).
+* 🔄 TESTING and WORKLOG sections, docs images (`tools/render_splat_docs.py`).
 
 ## Log
 
@@ -105,3 +118,5 @@ harmonics degree 3, 946 MB.
 * **2026-11-05:** first splat tour failed before driving: nav2_bringup's `RewrittenYaml` drops the
   backslashes of a Windows map path (`C:isaac-sim-standalone-6.2.0RosOrinPro...`). The launch file now passes
   forward slashes. The test harness now stops at once when Nav2's bringup aborts. Second run: **5/5 goals**.
+* **2026-11-05:** ground-truth check added to the goal tool (`--ground-truth`). Results: splat 5/5 (true error
+  4–11 cm), arena AMCL 4/4 (4–8 cm), arena SLAM 3/4 (slam_toolbox drift in the small square arena).

@@ -43,6 +43,9 @@ check that it works.
   read on the robot's ROS domain. The simulated sensors publish on a separate domain.
 * **Reproducible pipeline.** `launch\build_all.bat` rebuilds everything from the Hiwonder description. Tests
   cover driving, the arm, the gripper, every topic, TF correctness, grasping, the twin mode and the battery.
+* **Autonomous navigation with Nav2 (new).** ROS 2 Humble Nav2 and slam_toolbox run natively on Windows
+  (RoboStack via pixi, no WSL or Docker). The robot drives itself through a **Gaussian-splat scan of a real
+  building** (`scenes/splat_world.usd`) and through the test arena. See [Navigation with Nav2](#navigation-with-nav2-new).
 
 ## Quick start (this PC)
 
@@ -79,6 +82,41 @@ You can also open `RosOrin_Claude.usd` directly in Isaac Sim. The robot graphs w
 bridge is loaded. Plain `isaac-sim.bat` defaults to **ROS 2 Jazzy + Zenoh**, which needs a Zenoh router and
 does not talk to a Humble robot, so use `launch\run_isaacsim.bat` or call `launch\rosorin_env.bat` first.
 
+| Command (new, Nav2 and the splat building) | What it does |
+|---|---|
+| `launch\build_splat_world.bat` | Builds `scenes\splat_world.usd` from the Gaussian splat in `..\Splats\`: USD splat, Nav2 map, collision/lidar proxy |
+| `launch\run_isaacsim.bat scenes\splat_world.usd` | The robot in the splat building |
+| `cd nav2` then `pixi run nav world:=splat` | Nav2 + RViz on the building's map (`world:=arena` for the test arena, `slam:=True` for mapping) |
+| `cd nav2` then `pixi run goal --world splat --tour` | Drives to every named place, reports time, distance and error |
+| `launch\run_nav2_test.bat` | End-to-end Nav2 test: simulation + Nav2 + tour, report in `tests/results/` |
+
+## Navigation with Nav2 (new)
+
+| The building, as a camera sees it | Its Nav2 map, made from the splat | The wrist camera in the building |
+|---|---|---|
+| ![](docs/images/splat/hall_view.png) | ![](docs/images/splat_map.png) | ![](docs/images/splat/robot_camera_rgb.png) |
+
+```bat
+:: one-time: install pixi (user-level) and the ROS 2 Humble + Nav2 environment
+winget install prefix-dev.pixi
+cd C:\isaac-sim-standalone-6.2.0\RosOrinPro-IsaacSim\nav2 && pixi install && pixi run build
+
+:: terminal 1, in the repository folder: the robot in the splat building (press Play)
+launch\run_isaacsim.bat scenes\splat_world.usd
+:: terminal 2: Nav2 + RViz; click "Nav2 Goal" in RViz, or terminal 3: pixi run goal --world splat --tour
+cd nav2 && pixi run nav world:=splat
+```
+
+* **Nav2 runs on Windows itself.** [RoboStack](https://robostack.github.io/) packages ROS 2 Humble, Nav2
+  1.1 and slam_toolbox for Windows, and pixi installs them into `nav2\.pixi\`. It is the same Humble +
+  FastDDS as the simulator and the Jetson, so they discover each other directly.
+* **Mecanum-aware.** MPPI controller with the Omni motion model, AMCL with the omni motion model, and the
+  measured footprint. Details in [docs/NAV2.md](docs/NAV2.md).
+* **The splat building.** The 946 MB Gaussian splat (4 M Gaussians) is converted with Isaac Sim's own
+  converter. Its floor and obstacles become the Nav2 map and invisible collision/lidar geometry, because
+  Gaussians have no collision and no lidar return. How and why: [docs/SPLAT_ENVIRONMENT.md](docs/SPLAT_ENVIRONMENT.md).
+* `nav2/rosorin_nav2` is an ordinary ROS 2 package, meant for the real robot too (`use_sim_time:=False`).
+
 ## Real robot features in the simulation
 
 Rows follow [Robot-ROSOrin-Pro/Features](https://github.com/MatinEsmaeili00/Robot-ROSOrin-Pro). All topics are
@@ -103,6 +141,7 @@ listed in [docs/ROS2_INTERFACE.md](docs/ROS2_INTERFACE.md).
 | 17 | Buttons and joystick | ❌ Hardware. Use `teleop_keyboard.py` or any joystick node publishing `/cmd_vel`. | — |
 | 18 | Voice control | ➖ Microphone-array hardware. You can publish `/asr_node/voice_words` by hand. | — |
 | 19 | ROSBridge | ➖ Run `rosbridge_server` on any ROS 2 machine. It sees the simulated topics. | — |
+| — | Mapping and navigation (new) | ✅ Nav2 (AMCL or slam_toolbox, MPPI omni controller) in the test arena and the Gaussian-splat building ([docs/NAV2.md](docs/NAV2.md)) | `/map`, `/plan`, `navigate_to_pose`, `/cmd_vel` |
 | — | TF, sim time, robot model | ✅ URDF-shaped `/tf` tree, `/clock`, latched `/robot_description` | `/tf`, `/clock`, `/robot_description` |
 
 ✅ simulated · 🟡 simulated with a documented difference · ➖ runs on the ROS side against the simulated topics · ❌ hardware-only
@@ -153,6 +192,17 @@ ros2_tools/                   teleop, arm CLI, topic checker, demo (bundled rclp
 tests/                        end-to-end, grasp, twin/battery, mecanum tuning sweeps, performance benchmark
 tools/render_docs.py          renders the images in docs/images
 docs/                         TESTING, SOURCES, WORKLOG, DECISIONS, ARCHITECTURE, ROS2_INTERFACE
+
+new for Nav2 and the splat building:
+nav2/                         pixi environment (ROS 2 Humble + Nav2 from RoboStack) and the colcon workspace
+nav2/rosorin_nav2/            ROS 2 package: Nav2 params, launch, maps, worlds (spawn + places), goal tool, RViz
+config/splat_world.yaml       splat path, crop box, occupancy thresholds, proxy, scene
+scenes/splat_world.usd        robot + Gaussian-splat building + proxy (the splat USD itself is generated, not in git)
+scenes/splat_proxy.usd        invisible collision boxes + camera-hidden lidar strip, from the occupied map cells
+scripts/build_splat_scene.py  PLY -> USD splat, map, proxy, scene;  scripts/splat_occupancy.py (the map maths)
+scripts/build_usd_map.py      Nav2 map from the colliders of a USD scene (the test arena)
+tests/test_nav2.py            end-to-end Nav2 test (launch\run_nav2_test.bat)
+docs/NAV2.md, docs/SPLAT_ENVIRONMENT.md, docs/NAV2_TODO.md
 ```
 
 Your scene `C:\isaac-sim-standalone-6.2.0\RosOrin_Claude.usd` references `./RosOrinPro-IsaacSim/usd/rosorin_pro.usd`
@@ -211,6 +261,10 @@ How to run each check yourself, with the expected output: [docs/TESTING.md](docs
   rollers, contact tuning, IK, init pose, gripper, cameras, performance, TF, twin mode).
 * [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): build pipeline, USD structure, OmniGraph graphs, runtime.
 * [docs/ROS2_INTERFACE.md](docs/ROS2_INTERFACE.md): every topic, type, rate and frame, plus the TF tree.
+* [docs/NAV2.md](docs/NAV2.md) (new): Nav2 setup, running, parameters, real robot, troubleshooting.
+* [docs/SPLAT_ENVIRONMENT.md](docs/SPLAT_ENVIRONMENT.md) (new): how the Gaussian-splat building becomes a
+  navigable scene and a Nav2 map, with the tests behind each choice.
+* [docs/NAV2_TODO.md](docs/NAV2_TODO.md) (new): progress and to-do list of the Nav2 work.
 
 ## License and credits
 

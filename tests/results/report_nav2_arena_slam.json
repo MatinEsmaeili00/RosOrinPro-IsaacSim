@@ -1,0 +1,128 @@
+{
+  "world": "arena",
+  "slam": true,
+  "scene": "scenes/rosorin_world.usd",
+  "date": "2026-11-05 13:35",
+  "ok": false,
+  "sim_start_s": 37.0,
+  "goals": [
+    {
+      "status": "SUCCEEDED",
+      "sim_time_s": 13.12,
+      "wall_time_s": 18.36,
+      "distance_m": 1.992,
+      "final_pose": [
+        1.285,
+        1.236,
+        78.6
+      ],
+      "position_error_m": 0.066,
+      "yaw_error_deg": 11.4,
+      "true_pose": [
+        1.356,
+        1.366,
+        83.0
+      ],
+      "true_position_error_m": 0.086,
+      "localization_error_m": 0.147,
+      "localization_yaw_error_deg": 4.4,
+      "name": "north_east",
+      "target": [
+        1.3,
+        1.3,
+        90.0
+      ]
+    },
+    {
+      "status": "SUCCEEDED",
+      "sim_time_s": 61.35,
+      "wall_time_s": 84.89,
+      "distance_m": 4.342,
+      "final_pose": [
+        -1.273,
+        -1.254,
+        -99.0
+      ],
+      "position_error_m": 0.054,
+      "yaw_error_deg": 9.0,
+      "true_pose": [
+        -1.356,
+        -1.452,
+        -94.8
+      ],
+      "true_position_error_m": 0.162,
+      "localization_error_m": 0.215,
+      "localization_yaw_error_deg": 4.2,
+      "name": "south_west",
+      "target": [
+        -1.3,
+        -1.3,
+        -90.0
+      ]
+    },
+    {
+      "status": "ABORTED",
+      "sim_time_s": 255.75,
+      "wall_time_s": 369.25,
+      "distance_m": 6.19,
+      "final_pose": [
+        -1.045,
+        0.13,
+        -114.1
+      ],
+      "position_error_m": 0.372,
+      "yaw_error_deg": 155.9,
+      "true_pose": [
+        -1.067,
+        0.9,
+        -142.3
+      ],
+      "true_position_error_m": 0.552,
+      "localization_error_m": 0.771,
+      "localization_yaw_error_deg": 28.2,
+      "name": "by_crate",
+      "target": [
+        -1.3,
+        0.4,
+        90.0
+      ]
+    },
+    {
+      "status": "SUCCEEDED",
+      "sim_time_s": 8.45,
+      "wall_time_s": 11.74,
+      "distance_m": 1.561,
+      "final_pose": [
+        -0.041,
+        -0.006,
+        -8.7
+      ],
+      "position_error_m": 0.041,
+      "yaw_error_deg": 8.7,
+      "true_pose": [
+        0.343,
+        0.294,
+        -28.3
+      ],
+      "true_position_error_m": 0.452,
+      "localization_error_m": 0.487,
+      "localization_yaw_error_deg": 19.6,
+      "name": "start",
+      "target": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "goal_exit_code": 1,
+  "wall_s": 848.1,
+  "summary": {
+    "succeeded": 3,
+    "goals": 4,
+    "distance_m": 14.09,
+    "sim_time_s": 338.7,
+    "max_true_position_error_m": 0.552,
+    "max_localization_error_m": 0.771
+  }
+}
