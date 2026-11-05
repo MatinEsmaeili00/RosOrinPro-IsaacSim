@@ -34,19 +34,28 @@ harmonics degree 3, 946 MB.
 * ✅ Branch `feature/nav2-splat`, this file, draft pull request.
 
 ### Phase 1: Nav2 on this PC
-* ⬜ Install pixi (user-level, no admin).
-* ⬜ `nav2/pixi.toml`: ROS 2 Humble environment with Nav2, slam_toolbox, RViz 2 and FastDDS.
-* ⬜ Check that the pixi ROS 2 and Isaac Sim's bundled ROS 2 see each other (topics, `/clock`).
+* ✅ Install pixi 0.81 (winget, user-level, no admin).
+* ✅ `nav2/pixi.toml` + `pixi.lock`: ROS 2 Humble with Nav2 1.1.18, slam_toolbox 2.6.10, RViz 2,
+  FastDDS 2.6.10 (3.9 GB in `nav2\.pixi\`, not committed).
+* ✅ The pixi ROS 2 sees every simulator topic (`pixi run topics` lists all 19 in 4 s).
+  Note: the `ros2` CLI daemon hangs on Windows, so use `--no-daemon` (the `topics` task does).
 
 ### Phase 2: `rosorin_nav2` ROS 2 package
-* ⬜ Nav2 parameters for the mecanum base: holonomic controller, AMCL omni motion model, footprint,
-  costmaps from `/scan`, `use_sim_time`.
-* ⬜ Launch files: navigation on a saved map, SLAM mapping, RViz.
-* ⬜ Goal tool `ros2_tools/nav2_goal.py` (send a goal or a list of waypoints, report the result).
+* ✅ Nav2 parameters for the mecanum base (`nav2/rosorin_nav2/config/nav2_params.yaml`): MPPI controller
+  with the Omni motion model, AMCL `OmniMotionModel`, measured footprint, costmaps from `/scan`,
+  slam_toolbox section.
+* ✅ Launch file `bringup.launch.py`: AMCL on a saved map or `slam:=True`, initial pose per scene from
+  `config/worlds.yaml`, RViz.
+* ✅ Goal tool `ros2 run rosorin_nav2 goal` (x y yaw, `--place`, `--tour`, `--json`). It lives in the
+  package, not in `ros2_tools/`, because Isaac Sim's bundled ROS 2 has no `nav2_msgs`.
 
 ### Phase 3: Nav2 in the existing test arena (known geometry)
-* ⬜ Occupancy map of the test arena.
-* ⬜ Nav2 reaches goals in the arena; automated test with results in `tests/results/`.
+* ✅ First live run (SLAM + Nav2 against the headless arena simulation): goal 1 m ahead **SUCCEEDED**,
+  0.95 m driven in 4.5 s sim time, final error 0.14 m.
+* 🔄 Automated test (`tests/test_nav2.py`): starts the simulation and Nav2, runs a tour, writes
+  `tests/results/report_nav2_*.json`. (The first tour attempt stopped because the headless run had
+  `--duration 400` and the simulation ended. Not a Nav2 problem.)
+* ⬜ Occupancy map of the test arena (from the PhysX colliders) for AMCL.
 
 ### Phase 4: the splat environment
 * ✅ Analyse the PLY (orientation, scale, extent).
@@ -68,3 +77,7 @@ harmonics degree 3, 946 MB.
 
 * **2026-11-05:** read the repo, analysed the splat, chose native-Windows Nav2 (RoboStack Humble).
   Created this tracker.
+* **2026-11-05:** Nav2 environment installed and the `rosorin_nav2` package built. First Nav2 goal reached
+  in the simulation. Found: in `/scan` the ~147 beams blocked by the robot's own body are `-1.0`, below
+  `range_min`, so the costmaps drop them and AMCL treats them as max-range. They are blind spots (rear
+  ±72° and two small wedges at about ±55° to the front), not phantom obstacles.
