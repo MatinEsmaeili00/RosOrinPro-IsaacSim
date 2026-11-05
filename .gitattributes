@@ -10,3 +10,9 @@
 *.jpg binary
 # vendored inputs: keep byte-identical to the originals (no line-ending conversion)
 sources/** -text
+
+# Nav2 maps and pixi files
+*.pgm binary
+*.sh text eol=lf
+*.toml text eol=lf
+pixi.lock text eol=lf

@@ -59,12 +59,19 @@ harmonics degree 3, 946 MB.
 
 ### Phase 4: the splat environment
 * ✅ Analyse the PLY (orientation, scale, extent).
-* ⬜ Convert the PLY to USD with Isaac Sim's Gaussian-splat converter and check that it renders.
-* ⬜ Build a collision and lidar proxy from the splat (walls, furniture), because physics and the lidar
-  do not see Gaussians.
-* ⬜ Occupancy map (`map.yaml` + `map.pgm`) from the splat.
-* ⬜ Scene `scenes/splat_world.usd`: splat + proxy + robot at a free spawn pose.
-* ⬜ Check that the robot camera sees the splat and the lidar sees the proxy.
+* ✅ Convert the PLY to USD with Isaac Sim's converter (`omni.kit.converter.gsplat`, half precision):
+  3.94 M Gaussians after cropping, `usd/splat/building.usd` (512 MB, not in git, rebuilt by
+  `launchuild_splat_world.bat`). It renders in RTX: see `docs/images/splat/hall_view.png`.
+* ✅ Occupancy grid from the Gaussians (`scripts/splat_occupancy.py`): floor layer = free, robot-height band =
+  obstacles, ring around the scanned floor = walls. 166 m² free.
+* ✅ Nav2 map `nav2/rosorin_nav2/maps/splat_building.{pgm,yaml}` + preview `docs/images/splat_map.png`.
+* ✅ Proxy geometry `scenes/splat_proxy.usd`: invisible collision boxes + a thin camera-hidden strip at the
+  lidar height. Five variants tested (details in the log below).
+* ✅ Scene `scenes/splat_world.usd`: splat + proxy + robot in the hall (spawn 2.98, 0.12, 70°).
+* ✅ Sensors in the splat world: `sensor_snapshot.py` **6/6 PASS** (camera sees the splat, depth 99 % valid,
+  lidar 237 beams on the walls).
+* ✅ All 5 named places free (clearance 0.9–1.9 m) and reachable from the spawn
+  (`tests/results/splat_build_report.json`). The lab is not reachable (its doorway is too narrow in the scan).
 
 ### Phase 5: Nav2 through the splat building
 * ⬜ Navigate between rooms (several goals or waypoints), with results and pictures.
@@ -81,3 +88,13 @@ harmonics degree 3, 946 MB.
   in the simulation. Found: in `/scan` the ~147 beams blocked by the robot's own body are `-1.0`, below
   `range_min`, so the costmaps drop them and AMCL treats them as max-range. They are blind spots (rear
   ±72° and two small wedges at about ±55° to the front), not phantom obstacles.
+* **2026-11-05:** splat scene built and checked. Problems found and fixed on the way:
+  1. The splat did not show in the scene: `UsdGeom.Xform.Define()` on the referencing prim wrote a local
+     `Xform` type that overrode `ParticleField3DGaussianSplat`. Now a typeless prim.
+  2. Gaussians have no collision and no lidar return, so a proxy is needed. Tests of the proxy's render flags:
+     `invisible` and `guide` are ignored by the RTX lidar (no `/scan` is published at all);
+     `hideForCamera` is seen by the lidar but cuts the Gaussians behind it out of camera images (dark 50 cm
+     bands, `docs/images/splat/hall_view_full_height_proxy.png`); adding `doNotCastShadows` removes the bands
+     but also hides it from the lidar; switching off light shadows does not help.
+     Solution: invisible full-height collision boxes + a 6.5 cm camera-hidden strip around the beam height.
+

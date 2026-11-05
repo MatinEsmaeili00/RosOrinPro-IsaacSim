@@ -13,3 +13,18 @@ arena:
     behind_pillar: [1.5, -1.6, 0.0]
     by_crate: [-1.3, 0.4, 90.0]
   tour: [north_east, south_west, by_crate, start]
+
+splat:
+  description: "Gaussian-splat building scan (scenes/splat_world.usd, built by launch\build_splat_world.bat)"
+  map: splat_building.yaml
+  # Hall, facing up the hall. Places = the most open spot of each area (clearance 0.95-2.0 m), checked
+  # reachable from the spawn by scripts/build_splat_scene.py. The lab (south-west) is not in the list: its
+  # doorway is narrower than the robot in the reconstruction.
+  spawn: [2.98, 0.12, 70.0]
+  places:
+    hall: [2.98, 0.12, 70.0]
+    conference_room: [-1.22, 4.83, 180.0]
+    north_hall: [7.23, 12.73, 70.0]
+    east_lounge: [7.38, 0.28, 0.0]
+    south_hall: [-1.53, -5.07, -110.0]
+  tour: [conference_room, north_hall, east_lounge, south_hall, hall]
