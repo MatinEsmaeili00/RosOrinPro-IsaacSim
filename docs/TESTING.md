@@ -255,7 +255,7 @@ there (`python3 ros2_tools/check_topics.py`).
 | console: `Could not find node type interface` | the ROS 2 bridge was loaded after the scene | start with `launch\run_isaacsim.bat` |
 | robot ignores `/cmd_vel` | not playing, or twin mode is on (`ROSORIN_TWIN_DOMAIN` set), which hands the robot to the real one | press Play; `set ROSORIN_TWIN_DOMAIN=` |
 | `FAIL depth` with few valid pixels | arm pointing up (`pose up`): the camera sees nothing within 3 m | `arm.py pose init` |
-| `FAIL battery` only | in the simulator: the scene was not started with the launcher. On the real robot: its controller driver is not running | start with `launchun_isaacsim.bat` |
+| `FAIL battery` only | in the simulator: the scene was not started with the launcher. On the real robot: its controller driver is not running | start with `launch\run_isaacsim.bat` |
 | another computer sees no topics | firewall blocks UDP, different subnet, or different `ROS_DOMAIN_ID` / RMW | allow Isaac Sim and Python in Windows Firewall (private network); same domain; `rmw_fastrtps_cpp` |
 | rates about half the expected value | the simulation runs at 0.5–0.6× real time on this PC | expected; start ROS nodes with `use_sim_time:=true` |
 | `run_tests.bat` fails on topic counts or motion | Isaac Sim GUI still running on the same domain | close it first, or `set ROS_DOMAIN_ID=5` before the test |
