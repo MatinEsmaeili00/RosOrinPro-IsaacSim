@@ -237,6 +237,7 @@ To change the lidar variant: `python.bat scripts\build_sim_urdf.py --lidar MS200
 | `tests/test_nav2.py` (new): Nav2 + AMCL tour of the **splat building**, 5 places, 62.6 m; true final error 4–11 cm, localization error 2–10 cm | **5 / 5** |
 | `tests/test_nav2.py --world arena` (new): Nav2 + AMCL tour of the test arena; true final error 4–8 cm | **4 / 4** |
 | `tests/test_nav2.py --world arena --slam` (new): Nav2 + slam_toolbox in the test arena (SLAM drifted on one leg, see WORKLOG § 16) | 3 / 4 |
+| `tests/test_nav2.py --world splat --slam` (new): mapping while driving; far, unexplored places cannot be planned yet, and the SLAM pose drifts up to 0.6 m | 3 / 5 |
 | `sensor_snapshot.py` in the splat building (new): camera sees the splat, depth 99 % valid, lidar 237 beams | 6 / 6 |
 
 Results are in `tests/results/`. Tuning and benchmark data are explained in [docs/DECISIONS.md](docs/DECISIONS.md).

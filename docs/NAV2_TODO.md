@@ -59,8 +59,7 @@ harmonics degree 3, 946 MB.
   (`tests/results/report_nav2_arena.json`).
 * ⚠️ **Arena, SLAM: 3/4 goals.** slam_toolbox's pose drifted to 0.77 m / 28° from ground truth on the third
   leg and that goal aborted (`report_nav2_arena_slam.json`). The simulated odometry is exact, so this is
-  scan matching in a small, square room with the lidar's blind sectors. 🔄 Tuning the slam_toolbox
-  parameters.
+  scan matching in a small, square room with the lidar's blind sectors.
 
 ### Phase 4: the splat environment
 * ✅ Analyse the PLY (orientation, scale, extent).
@@ -92,11 +91,26 @@ harmonics degree 3, 946 MB.
 | → south_hall | 10.4 m | 39 s | 0.11 m | 0.09 m |
 | → hall | 7.2 m | 27 s | 0.06 m | 0.05 m |
 
+* ⚠️ **Splat building, SLAM: 3/5 goals** (`report_nav2_splat_slam.json`). The two far places (6.5 m and
+  13 m, unexplored at the start) cannot be planned, because SLAM's costmap only covers what is mapped
+  so far. The three reachable ones succeeded, with the SLAM pose drifting up to 0.64 m. **Use the
+  generated map + AMCL to navigate** (5/5, 2–10 cm); SLAM is for mapping new places.
+
 ### Phase 6: documentation
-* ✅ `docs/NAV2.md` (how to run, parameters, real robot, troubleshooting).
+* ✅ `docs/NAV2.md` (how to run, parameters, SLAM notes, real robot, troubleshooting).
 * ✅ `docs/SPLAT_ENVIRONMENT.md` (how the scene is made, the proxy tests, using your own splat).
-* ✅ README: new sections and rows only (54 lines added, none removed).
-* 🔄 TESTING and WORKLOG sections, docs images (`tools/render_splat_docs.py`).
+* ✅ README, TESTING (§ 6) and WORKLOG (§ 16 + open items): new sections and rows only.
+* ✅ Docs images: `tools/render_splat_docs.py` and `sensor_snapshot.py` → `docs/images/splat/`.
+
+### Open items (for you to decide or for a next session)
+* ⬜ Run `rosorin_nav2` on the real robot (`use_sim_time:=False`), see `docs/NAV2.md` "On the real robot".
+* ⬜ SLAM accuracy: slam_toolbox drifts 0.3–0.8 m in the simulation. Suspects are listed in WORKLOG
+  "Not done / open items".
+* ⬜ Lidar beam height (older open item): a real `/scan` would show whether the 147 blind beams are real.
+  Fewer blind beams would also help SLAM and AMCL.
+* ⬜ The lab in the splat building is unreachable (narrow doorway in the reconstruction). Lowering
+  `occupancy.obstacle_min_weight` or editing the map by hand could open it.
+* ⬜ Merge the pull request when you are happy with it (nothing on `main` was changed).
 
 ## Log
 
@@ -120,3 +134,7 @@ harmonics degree 3, 946 MB.
   forward slashes. The test harness now stops at once when Nav2's bringup aborts. Second run: **5/5 goals**.
 * **2026-11-05:** ground-truth check added to the goal tool (`--ground-truth`). Results: splat 5/5 (true error
   4–11 cm), arena AMCL 4/4 (4–8 cm), arena SLAM 3/4 (slam_toolbox drift in the small square arena).
+* **2026-11-05:** SLAM tests. A first SLAM run in the splat building was meaningless: SLAM's map frame starts
+  at the spawn pose, not at the scene origin. Fixed with the goal tool's `--slam` flag. Then 3/5 (far
+  unexplored goals cannot be planned, the SLAM pose drifts up to 0.64 m). Documented. AMCL on the generated
+  map is the recommended way to navigate the building.

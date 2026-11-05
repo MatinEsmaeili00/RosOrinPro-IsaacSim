@@ -232,10 +232,15 @@ how-to is [NAV2.md](NAV2.md) and [SPLAT_ENVIRONMENT.md](SPLAT_ENVIRONMENT.md).
   | Splat building, AMCL, 5-place tour (two runs, identical) | **5 / 5** | 62.6 m in 226 s sim | 4–11 cm | 2–10 cm, ≤ 1.1° |
   | Test arena, AMCL, 4-place tour | **4 / 4** | 8.6 m | 4–8 cm | 5–7 cm |
   | Test arena, SLAM (slam_toolbox), 4-place tour | 3 / 4 | 14.1 m | – | drifted to 0.77 m / 28° on leg 3 |
+  | Splat building, SLAM, 5-place tour (`--slam` places) | 3 / 5 | 25.5 m | 0.37–0.58 m | 0.05 m at first, then 0.3–0.64 m |
 
   No recovery behaviour was needed in the splat tours. In the small square arena, SLAM's scan matching
   drifted (odometry is exact in the simulation, so the error is the matcher's), the robot pushed into an
-  obstacle it did not expect, and that goal was aborted.
+  obstacle it did not expect, and that goal was aborted. In the splat building, the two far places (6.5 m
+  and 13 m away, unexplored at the start) could not be planned, because SLAM's costmap only covers what is
+  already mapped. The three reachable ones succeeded, but the SLAM pose drifted by up to 0.64 m.
+  A first SLAM run in the splat building gave nonsense: the test sent scene coordinates, while SLAM's map
+  frame starts at the robot's spawn pose. The goal tool's `--slam` flag converts them now.
 
 ## Not done / open items
 
@@ -254,7 +259,10 @@ how-to is [NAV2.md](NAV2.md) and [SPLAT_ENVIRONMENT.md](SPLAT_ENVIRONMENT.md).
 * The physics runs at 0.5–0.6× real time on this PC's CPU (Xeon, Cascade Lake). Use `use_sim_time:=true`.
 * **Nav2 (added 2026-11-05):** `nav2/rosorin_nav2` has not run on the real robot yet. Check the speed limits,
   the footprint and the robot's own TF/odometry first ([NAV2.md](NAV2.md), "On the real robot").
-* **SLAM in the small test arena** drifted on one leg of four (see § 16). AMCL on the saved maps is
-  reliable. Tune slam_toolbox's scan matcher or map a larger space.
+* **SLAM accuracy** (see § 16): slam_toolbox drifts 0.3–0.8 m in the simulation even though the simulated
+  odometry is exact, while AMCL on the saved maps stays within 2–10 cm. Suspects to check: the scan time
+  stamp and motion distortion of the RTX lidar (one 0.1 s rotation while the robot turns), the 147 blind beams,
+  and the matcher's odometry penalties (`distance_variance_penalty`, `angle_variance_penalty`,
+  `correlation_search_space_dimension`).
 * **Splat building:** the lab (south-west) is not reachable, because its doorway is narrower than the robot
   in the reconstruction. The camera images show a thin dark line at 0.10–0.165 m where the lidar strip is.

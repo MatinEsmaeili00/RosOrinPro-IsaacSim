@@ -69,6 +69,16 @@ pixi run ros2 run nav2_map_server map_saver_cli -f my_map --ros-args -p use_sim_
 pixi run nav world:=splat map:=C:/path/to/my_map.yaml
 ```
 
+* **The SLAM map frame starts where the robot starts**, not at the scene's origin. Named places are scene
+  coordinates, so add `--slam` to the goal tool: `pixi run goal --world splat --slam --place east_lounge`.
+  (With a saved map, AMCL's map frame is the scene frame and no flag is needed.)
+* **Goals must lie in the part already mapped.** Nav2's global costmap only covers the SLAM map so far, so a
+  goal in unexplored space fails to plan (`GridBased: failed to create plan`). Map step by step: nearby goals or
+  teleop first.
+* **Accuracy (measured):** in the splat building, slam_toolbox's pose drifted to 0.3–0.6 m from ground truth
+  over 25 m. AMCL on the saved map stays within 2–10 cm. Use SLAM to map a new place, and AMCL to navigate.
+  Tuning slam_toolbox for this robot is an open item ([WORKLOG.md](WORKLOG.md)).
+
 ### Automated test
 
 ```bat

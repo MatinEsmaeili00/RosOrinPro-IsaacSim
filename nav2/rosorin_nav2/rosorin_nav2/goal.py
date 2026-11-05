@@ -170,6 +170,9 @@ def main(argv=None):
     ap.add_argument("--ground-truth", action="store_true",
                     help="simulation only: /odom is exact and starts at the world's spawn pose, so also report the "
                          "true position error and AMCL's localization error")
+    ap.add_argument("--slam", action="store_true",
+                    help="Nav2 runs with slam:=True: the map frame starts at the robot's start pose, so --place / "
+                         "--tour positions (scene coordinates) are converted relative to the world's spawn pose")
     args = ap.parse_args(rclpy.utilities.remove_ros_args(argv if argv is not None else sys.argv)[1:])
 
     with open(os.path.join(get_package_share_directory("rosorin_nav2"), "config", "worlds.yaml"),
@@ -188,7 +191,15 @@ def main(argv=None):
         for n in names:
             if n not in places:
                 ap.error("unknown place %r in world %r (have %s)" % (n, args.world, sorted(places)))
-            goals.append((n,) + tuple(float(v) for v in places[n]))
+            px, py, pyaw = (float(v) for v in places[n])
+            if args.slam:
+                # SLAM's map frame starts at the robot's start pose, not at the scene's origin: express the
+                # place (world coordinates) relative to the spawn pose
+                sx, sy, syaw = (float(v) for v in worlds[args.world]["spawn"])
+                c, s = math.cos(math.radians(syaw)), math.sin(math.radians(syaw))
+                dx, dy = px - sx, py - sy
+                px, py, pyaw = c * dx + s * dy, -s * dx + c * dy, pyaw - syaw
+            goals.append((n, px, py, pyaw))
     if not goals:
         ap.error("give x y [yaw], --place NAME or --tour")
 
@@ -198,7 +209,8 @@ def main(argv=None):
         if args.world not in worlds:
             ap.error("--ground-truth needs --world (have %s)" % sorted(worlds))
         sx, sy, syaw = (float(v) for v in worlds[args.world]["spawn"])
-        node.truth_spawn = (sx, sy, math.radians(syaw))
+        # with --slam the map frame is the start frame, i.e. /odom itself
+        node.truth_spawn = (0.0, 0.0, 0.0) if args.slam else (sx, sy, math.radians(syaw))
     results = []
     try:
         print("[goal] waiting for Nav2 and localization (map -> base_footprint) ...", flush=True)

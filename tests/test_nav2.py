@@ -143,6 +143,8 @@ def main():
         goal_cmd = [pixi, "run", "--frozen", "ros2", "run", "rosorin_nav2", "goal", "--world", args.world,
                     "--timeout", str(args.goal_timeout), "--json", goal_json, "--ground-truth"]
         goal_cmd += sum((["--place", p] for p in args.place), []) if args.place else ["--tour"]
+        if args.slam:
+            goal_cmd.append("--slam")  # SLAM's map frame starts at the spawn pose
         print("[test_nav2] sending goals ...", flush=True)
         with open(logs["goal"], "w", encoding="utf-8") as glog:
             g = subprocess.run(goal_cmd, cwd=NAV2, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
