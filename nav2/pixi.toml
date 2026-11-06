@@ -1,0 +1,44 @@
+# ROS 2 Humble + Nav2 environment for the ROSOrin Pro simulation (and any Humble machine).
+#
+# Windows: native ROS 2 Humble from RoboStack (conda packages), no WSL or Docker. It uses the same
+# distro (Humble) and middleware (FastDDS) as Isaac Sim's bundled ROS 2 and the robot's Jetson, so the
+# simulator, Nav2 and the real robot talk to each other directly.
+#
+#   cd nav2
+#   pixi install          (first time only, ~2-3 GB into nav2\.pixi\)
+#   pixi run build        (builds the rosorin_nav2 package into nav2\install\)
+#   pixi run nav          (Nav2 on the saved map of the default scene)  -> see docs/NAV2.md
+#
+# Or use the wrappers in launch\ (nav2_*.bat), which call these tasks.
+[workspace]
+name = "rosorin-nav2"
+description = "Nav2 (ROS 2 Humble, RoboStack) for the ROSOrin Pro Isaac Sim twin"
+channels = ["robostack-humble", "conda-forge"]
+platforms = ["win-64", "linux-64"]
+
+[dependencies]
+python = "3.11.*"
+ros-humble-ros-base = "*"
+ros-humble-rmw-fastrtps-cpp = "*"
+ros-humble-navigation2 = "*"
+ros-humble-nav2-bringup = "*"
+ros-humble-slam-toolbox = "*"
+ros-humble-rviz2 = "*"
+ros-humble-tf2-ros = "*"
+colcon-common-extensions = "*"
+setuptools = "<80"
+pyyaml = "*"
+numpy = "*"
+
+[target.win-64.activation]
+scripts = ["activate.bat"]
+
+[target.linux-64.activation]
+scripts = ["activate.sh"]
+
+[tasks]
+build = { cmd = "colcon build --merge-install --base-paths rosorin_nav2", description = "Build the rosorin_nav2 package into install/" }
+# Extra arguments are appended, e.g.  pixi run nav world:=arena rviz:=False   /   pixi run goal --world splat --tour
+nav = { cmd = "ros2 launch rosorin_nav2 bringup.launch.py", depends-on = ["build"], description = "Nav2 (AMCL on the saved map, or slam:=True) + RViz" }
+goal = { cmd = "ros2 run rosorin_nav2 goal", description = "Send goals / a tour to Nav2 and report the result" }
+topics = { cmd = "ros2 topic list --no-daemon", description = "List the topics (the ros2 CLI daemon can hang on Windows)" }

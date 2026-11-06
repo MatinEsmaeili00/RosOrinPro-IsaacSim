@@ -191,6 +191,57 @@ physics API: `XformPrim` returned stale USD values, which had broken the first g
   lidar housing, grazes the chassis. The data is in [DECISIONS.md](DECISIONS.md) § 8, and the item is added
   to the open items below.
 
+## 16. Nav2 and the Gaussian-splat building (follow-up request, 5 November 2026)
+
+> **Request:** add Nav2 so the robot can navigate on its own, through the Gaussian-splat environment in
+> `C:\isaac-sim-standalone-6.2.0\Splats\`. Work step by step, keep a to-do list and the progress on GitHub,
+> do not remove anything.
+
+Branch `feature/nav2-splat`, draft pull request #1. The live tracker is [NAV2_TODO.md](NAV2_TODO.md), and the
+how-to is [NAV2.md](NAV2.md) and [SPLAT_ENVIRONMENT.md](SPLAT_ENVIRONMENT.md).
+
+* **Where Nav2 runs.** This PC has no Linux ROS, only Docker Desktop and no WSL distro. The Isaac Sim skills
+  in this install list WSL2 as deprecated, and Docker would need DDS bridging. RoboStack publishes **ROS 2
+  Humble Nav2 1.1 and slam_toolbox for win-64**, so Nav2 runs natively, installed with pixi into
+  `nav2\.pixi\`. It uses the same Humble and FastDDS as the simulator and the Jetson, and the first
+  `ros2 topic list` from pixi saw all 19 simulator topics.
+* **`rosorin_nav2` package.** MPPI with the Omni motion model, AMCL with the omni model, the measured
+  footprint (±0.155 × ±0.118 m), and per-scene spawn poses and named places in `worlds.yaml`. The goal and
+  tour tool lives in the package because Isaac's bundled ROS 2 has no `nav2_msgs`.
+* **Lidar blind beams.** The ~147 self-occluded beams arrive as `-1.0` (below `range_min`). The costmap
+  projector drops them, and AMCL treats them as max range. They are blind spots (rear ±72°, and wedges at
+  about ±55° to the front), not phantom obstacles. The controller therefore prefers driving forward.
+* **The splat.** It is a standard 3DGS PLY with 4.0 M Gaussians. It turned out to be already Z-up and
+  metric: floor at 0, table tops at 0.71 m, ceiling at about 3 m. It is converted with Isaac's
+  `omni.kit.converter.gsplat`. The Nav2 map comes from the Gaussians: reconstructed floor = free, robot
+  height band = obstacles, edge of the floor = walls. That gives 166 m² free and 5 reachable named places.
+* **Problems found and fixed:**
+  1. The splat was missing from the scene. `UsdGeom.Xform.Define()` on the referencing prim authored a local
+     `Xform` type that overrode `ParticleField3DGaussianSplat`. The prim is now typeless.
+  2. Gaussians have no collision and no lidar return. Five render-flag variants of a proxy were tested.
+     The RTX lidar ignores `invisible` and `guide` prims (no `/scan` at all). Every prim it does see cuts the
+     Gaussians behind it out of camera images, and `doNotCastShadows` hides it from both. The solution:
+     invisible full-height collision boxes plus a 6.5 cm camera-hidden strip at the beam height.
+  3. nav2_bringup's `RewrittenYaml` drops the backslashes of Windows paths (`Failed to load map yaml file:
+     C:isaac-sim-...`). The launch file now passes `/`.
+  4. The `ros2` CLI daemon hangs on Windows: use `--no-daemon` (`pixi run topics`).
+* **Results** (`launch\run_nav2_test.bat`, ground truth from the exact simulated `/odom`):
+
+  | Run | Goals | Driven | True final error | AMCL / SLAM pose error |
+  |---|---|---|---|---|
+  | Splat building, AMCL, 5-place tour (two runs, identical) | **5 / 5** | 62.6 m in 226 s sim | 4–11 cm | 2–10 cm, ≤ 1.1° |
+  | Test arena, AMCL, 4-place tour | **4 / 4** | 8.6 m | 4–8 cm | 5–7 cm |
+  | Test arena, SLAM (slam_toolbox), 4-place tour | 3 / 4 | 14.1 m | – | drifted to 0.77 m / 28° on leg 3 |
+  | Splat building, SLAM, 5-place tour (`--slam` places) | 3 / 5 | 25.5 m | 0.37–0.58 m | 0.05 m at first, then 0.3–0.64 m |
+
+  No recovery behaviour was needed in the splat tours. In the small square arena, SLAM's scan matching
+  drifted (odometry is exact in the simulation, so the error is the matcher's), the robot pushed into an
+  obstacle it did not expect, and that goal was aborted. In the splat building, the two far places (6.5 m
+  and 13 m away, unexplored at the start) could not be planned, because SLAM's costmap only covers what is
+  already mapped. The three reachable ones succeeded, but the SLAM pose drifted by up to 0.64 m.
+  A first SLAM run in the splat building gave nonsense: the test sent scene coordinates, while SLAM's map
+  frame starts at the robot's spawn pose. The goal tool's `--slam` flag converts them now.
+
 ## Not done / open items
 
 * **Not tested against the physical robot.** No robot topics were visible on the network during this
@@ -206,3 +257,12 @@ physics API: `XformPrim` returned stale USD values, which had broken the first g
   `scan.png`. If the real scan has fewer gaps, lower the emitter, which is the `coin_d6` translate in
   `scripts/configure_robot.py`. About 16 mm lower leaves only the 64–69 beams blocked by the structure behind it.
 * The physics runs at 0.5–0.6× real time on this PC's CPU (Xeon, Cascade Lake). Use `use_sim_time:=true`.
+* **Nav2 (added 2026-11-05):** `nav2/rosorin_nav2` has not run on the real robot yet. Check the speed limits,
+  the footprint and the robot's own TF/odometry first ([NAV2.md](NAV2.md), "On the real robot").
+* **SLAM accuracy** (see § 16): slam_toolbox drifts 0.3–0.8 m in the simulation even though the simulated
+  odometry is exact, while AMCL on the saved maps stays within 2–10 cm. Suspects to check: the scan time
+  stamp and motion distortion of the RTX lidar (one 0.1 s rotation while the robot turns), the 147 blind beams,
+  and the matcher's odometry penalties (`distance_variance_penalty`, `angle_variance_penalty`,
+  `correlation_search_space_dimension`).
+* **Splat building:** the lab (south-west) is not reachable, because its doorway is narrower than the robot
+  in the reconstruction. The camera images show a thin dark line at 0.10–0.165 m where the lidar strip is.

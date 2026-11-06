@@ -1,0 +1,155 @@
+{
+  "world": "splat",
+  "slam": true,
+  "scene": "scenes/splat_world.usd",
+  "date": "2026-11-05 14:17",
+  "ok": false,
+  "sim_start_s": 91.2,
+  "goals": [
+    {
+      "status": "ABORTED",
+      "sim_time_s": 20.57,
+      "wall_time_s": 33.3,
+      "distance_m": 0.334,
+      "final_pose": [
+        0.056,
+        -0.266,
+        -169.5
+      ],
+      "position_error_m": 6.521,
+      "yaw_error_deg": 80.5,
+      "true_pose": [
+        0.027,
+        -0.306,
+        -169.3
+      ],
+      "true_position_error_m": 6.57,
+      "localization_error_m": 0.05,
+      "localization_yaw_error_deg": 0.2,
+      "name": "conference_room",
+      "target": [
+        2.9894676419338193,
+        5.557623882364716,
+        110.0
+      ]
+    },
+    {
+      "status": "ABORTED",
+      "sim_time_s": 29.03,
+      "wall_time_s": 47.0,
+      "distance_m": 0.63,
+      "final_pose": [
+        0.128,
+        0.086,
+        -73.9
+      ],
+      "position_error_m": 13.177,
+      "yaw_error_deg": 73.9,
+      "true_pose": [
+        0.245,
+        0.048,
+        -73.3
+      ],
+      "true_position_error_m": 13.061,
+      "localization_error_m": 0.123,
+      "localization_yaw_error_deg": 0.6,
+      "name": "north_hall",
+      "target": [
+        13.303109557244397,
+        0.31918036899657354,
+        0.0
+      ]
+    },
+    {
+      "status": "SUCCEEDED",
+      "sim_time_s": 18.33,
+      "wall_time_s": 29.72,
+      "distance_m": 5.038,
+      "final_pose": [
+        1.546,
+        -4.014,
+        -73.7
+      ],
+      "position_error_m": 0.127,
+      "yaw_error_deg": 3.7,
+      "true_pose": [
+        1.81,
+        -4.522,
+        -70.3
+      ],
+      "true_position_error_m": 0.469,
+      "localization_error_m": 0.573,
+      "localization_yaw_error_deg": 3.4,
+      "name": "east_lounge",
+      "target": [
+        1.6552394499586884,
+        -4.07992430852589,
+        -70.0
+      ]
+    },
+    {
+      "status": "SUCCEEDED",
+      "sim_time_s": 44.03,
+      "wall_time_s": 71.44,
+      "distance_m": 11.549,
+      "final_pose": [
+        -6.357,
+        2.431,
+        168.5
+      ],
+      "position_error_m": 0.07,
+      "yaw_error_deg": 11.5,
+      "true_pose": [
+        -6.858,
+        2.836,
+        167.2
+      ],
+      "true_position_error_m": 0.576,
+      "localization_error_m": 0.644,
+      "localization_yaw_error_deg": 1.3,
+      "name": "south_hall",
+      "target": [
+        -6.419515548277631,
+        2.4629291758842253,
+        -180.0
+      ]
+    },
+    {
+      "status": "SUCCEEDED",
+      "sim_time_s": 29.42,
+      "wall_time_s": 48.09,
+      "distance_m": 7.952,
+      "final_pose": [
+        0.028,
+        -0.078,
+        -12.0
+      ],
+      "position_error_m": 0.083,
+      "yaw_error_deg": 12.0,
+      "true_pose": [
+        -0.056,
+        -0.37,
+        -8.8
+      ],
+      "true_position_error_m": 0.374,
+      "localization_error_m": 0.304,
+      "localization_yaw_error_deg": 3.1,
+      "name": "hall",
+      "target": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "goal_exit_code": 1,
+  "wall_s": 640.2,
+  "summary": {
+    "succeeded": 3,
+    "goals": 5,
+    "distance_m": 25.5,
+    "sim_time_s": 141.4,
+    "max_true_position_error_m": 13.061,
+    "max_localization_error_m": 0.644
+  }
+}

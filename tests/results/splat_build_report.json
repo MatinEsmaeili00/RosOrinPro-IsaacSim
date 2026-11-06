@@ -1,0 +1,56 @@
+{
+  "ply": "splat (1).ply",
+  "gaussians": 3998372,
+  "gaussians_cropped": 3940323,
+  "splat_usd_mb": 512.2,
+  "occupancy": {
+    "gaussians_used": 1698048,
+    "grid_cells": [
+      470,
+      540
+    ],
+    "free_m2": 166.1,
+    "occupied_cells": 7253,
+    "free_components": 218
+  },
+  "map": "nav2/rosorin_nav2/maps/splat_building.yaml",
+  "places": {
+    "hall": {
+      "clearance_m": 1.63,
+      "reachable": true
+    },
+    "conference_room": {
+      "clearance_m": 0.9,
+      "reachable": true
+    },
+    "north_hall": {
+      "clearance_m": 1.86,
+      "reachable": true
+    },
+    "east_lounge": {
+      "clearance_m": 1.12,
+      "reachable": true
+    },
+    "south_hall": {
+      "clearance_m": 1.45,
+      "reachable": true
+    },
+    "spawn": {
+      "clearance_m": 1.63,
+      "reachable": true
+    }
+  },
+  "proxy": {
+    "rectangles": 3193,
+    "points": 51088,
+    "height_m": 0.5,
+    "render": "hide_for_camera",
+    "lidar_band_m": [
+      0.1,
+      0.165
+    ],
+    "usd_kb": 614.9
+  },
+  "ok": true,
+  "seconds": 7.2
+}

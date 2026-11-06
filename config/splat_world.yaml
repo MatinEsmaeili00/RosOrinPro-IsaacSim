@@ -1,0 +1,58 @@
+# Gaussian-splat environment for Nav2 (scripts/build_splat_scene.py, launch\build_splat_world.bat).
+# Paths are relative to the repository root. The spawn pose and the named places live in
+# nav2/rosorin_nav2/config/worlds.yaml (entry "splat"), so the simulator and Nav2 share them.
+
+splat:
+  # The 3DGS PLY (INRIA layout). 946 MB, not in git: it stays next to the Isaac Sim install.
+  ply: ../Splats/splat (1).ply
+  # It is already Z-up and metric (floor at z = 0, ceiling at ~3 m, table tops at 0.71 m), so no rotation.
+  up_axis: Z
+  # Keep only the building: a few hundred "floater" Gaussians reach +-440 m.
+  crop_min: [-11.0, -11.0, -0.5]
+  crop_max: [12.5, 16.0, 4.0]
+  # Converted USD (ParticleField3DGaussianSplat), generated, not in git (~0.5 GB with half precision).
+  usd: usd/splat/building.usd
+  half_precision: true
+
+occupancy:
+  # Grid used for the Nav2 map and the collision/lidar proxy. 5 cm = the Nav2 costmap resolution.
+  resolution: 0.05
+  # Gaussians that count as surface evidence: opaque enough and not huge blurry blobs.
+  min_opacity: 0.25          # after the sigmoid
+  max_scale: 0.25            # m, largest axis
+  # Floor layer: where the floor was reconstructed = where the robot can drive.
+  floor_band: [-0.08, 0.05]  # m, z of the Gaussian centre
+  floor_min_count: 2         # Gaussians per 5 cm cell
+  # Obstacles: anything in the robot's height band (the robot with its folded arm is ~0.33 m tall, so it
+  # fits under tables (0.71 m) but not under chair seats). Weighted by opacity.
+  obstacle_band: [0.08, 0.50]
+  obstacle_min_weight: 3.0
+  # Clean-up (cells): close gaps in the floor, then remove specks.
+  close_radius: 3
+  open_radius: 2
+  # Everything outside the reconstructed floor becomes a wall ring this many cells thick.
+  boundary_cells: 1
+
+proxy:
+  # Gaussians are visual only (no collision, no lidar return), so the occupied cells get stand-in geometry:
+  #   collision: invisible boxes 0..height that PhysX collides with
+  #   lidar:     thin boxes around the lidar beam (lidar_frame is 0.132 m above the floor), hidden for cameras
+  # Every prim the RTX lidar sees also blocks the Gaussians behind it in camera images, so the lidar strip is
+  # kept thin (see docs/SPLAT_ENVIRONMENT.md for the tests behind this).
+  height: 0.50
+  lidar_band: [0.100, 0.165]
+  # hide_for_camera (normal) | visible (debug: shows the lidar strip)
+  render: hide_for_camera
+  usd: scenes/splat_proxy.usd   # small, committed
+
+map:
+  # Written into the Nav2 package so `world:=splat` finds it.
+  name: splat_building
+  out_dir: nav2/rosorin_nav2/maps
+  preview: docs/images/splat_map.png
+
+scene:
+  usd: scenes/splat_world.usd
+  # physics floor (box collider) covering the building
+  ground_center: [0.75, 2.5]
+  ground_size: [30.0, 34.0]

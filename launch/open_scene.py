@@ -43,9 +43,26 @@ async def _main():
         await app.next_update_async()
     stage = ctx.get_stage()
     try:  # frame the robot in the viewport (the scene's saved camera may look elsewhere)
-        from isaacsim.core.rendering_manager import ViewportManager
+        import math
 
-        ViewportManager.set_camera_view("/OmniverseKit_Persp", eye=[1.15, -0.95, 0.75], target=[0.05, 0.0, 0.15])
+        from isaacsim.core.rendering_manager import ViewportManager
+        from pxr import Usd, UsdGeom
+
+        # same view as before, expressed in the robot frame, so it also works where the robot does not
+        # spawn at the origin (e.g. scenes/splat_world.usd)
+        px, py, pz, yaw = 0.0, 0.0, 0.0, 0.0
+        robot = stage.GetPrimAtPath("/World/rosorin_pro")
+        if robot:
+            m = UsdGeom.Xformable(robot).ComputeLocalToWorldTransform(Usd.TimeCode.Default())
+            t, xa = m.ExtractTranslation(), m.TransformDir((1.0, 0.0, 0.0))
+            px, py, pz, yaw = t[0], t[1], t[2], math.atan2(xa[1], xa[0])
+
+        def to_world(x, y, z):
+            c, s = math.cos(yaw), math.sin(yaw)
+            return [px + c * x - s * y, py + s * x + c * y, pz + z]
+
+        ViewportManager.set_camera_view("/OmniverseKit_Persp", eye=to_world(1.15, -0.95, 0.75),
+                                        target=to_world(0.05, 0.0, 0.15))
     except Exception as e:
         carb.log_warn("[rosorin] could not set the viewport camera: %s" % e)
     if TWIN is not None:
