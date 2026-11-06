@@ -116,6 +116,8 @@ cd nav2 && pixi run nav world:=splat
   converter. Its floor and obstacles become the Nav2 map and invisible collision/lidar geometry, because
   Gaussians have no collision and no lidar return. How and why: [docs/SPLAT_ENVIRONMENT.md](docs/SPLAT_ENVIRONMENT.md).
 * `nav2/rosorin_nav2` is an ordinary ROS 2 package, meant for the real robot too (`use_sim_time:=False`).
+* **Demos to show** (click a goal, the building tour, waypoints, a surprise obstacle, live SLAM):
+  [docs/NAV2_DEMOS.md](docs/NAV2_DEMOS.md).
 
 ## Real robot features in the simulation
 
@@ -202,7 +204,7 @@ scenes/splat_proxy.usd        invisible collision boxes + camera-hidden lidar st
 scripts/build_splat_scene.py  PLY -> USD splat, map, proxy, scene;  scripts/splat_occupancy.py (the map maths)
 scripts/build_usd_map.py      Nav2 map from the colliders of a USD scene (the test arena)
 tests/test_nav2.py            end-to-end Nav2 test (launch\run_nav2_test.bat)
-docs/NAV2.md, docs/SPLAT_ENVIRONMENT.md, docs/NAV2_TODO.md
+docs/NAV2.md, docs/SPLAT_ENVIRONMENT.md, docs/NAV2_TODO.md, docs/NAV2_DEMOS.md
 ```
 
 Your scene `C:\isaac-sim-standalone-6.2.0\RosOrin_Claude.usd` references `./RosOrinPro-IsaacSim/usd/rosorin_pro.usd`
@@ -239,6 +241,8 @@ To change the lidar variant: `python.bat scripts\build_sim_urdf.py --lidar MS200
 | `tests/test_nav2.py --world arena --slam` (new): Nav2 + slam_toolbox in the test arena (SLAM drifted on one leg, see WORKLOG § 16) | 3 / 4 |
 | `tests/test_nav2.py --world splat --slam` (new): mapping while driving; far, unexplored places cannot be planned yet, and the SLAM pose drifts up to 0.6 m | 3 / 5 |
 | `sensor_snapshot.py` in the splat building (new): camera sees the splat, depth 99 % valid, lidar 237 beams | 6 / 6 |
+| `tests/test_nav2.py --place north_hall --obstacle 5.37,6.0` (new): a 40 cm box that is not on the map, on the robot's usual path; the robot passes 0.69 m to the side | **1 / 1** |
+| Nav2 `FollowWaypoints` + `NavigateThroughPoses` (what RViz's waypoint buttons send), past the same box (new) | **2 / 2** |
 
 Results are in `tests/results/`. Tuning and benchmark data are explained in [docs/DECISIONS.md](docs/DECISIONS.md).
 How to run each check yourself, with the expected output: [docs/TESTING.md](docs/TESTING.md).
@@ -270,6 +274,8 @@ How to run each check yourself, with the expected output: [docs/TESTING.md](docs
 * [docs/SPLAT_ENVIRONMENT.md](docs/SPLAT_ENVIRONMENT.md) (new): how the Gaussian-splat building becomes a
   navigable scene and a Nav2 map, with the tests behind each choice.
 * [docs/NAV2_TODO.md](docs/NAV2_TODO.md) (new): progress and to-do list of the Nav2 work.
+* [docs/NAV2_DEMOS.md](docs/NAV2_DEMOS.md) (new): demos to show in the splat building, step by step, with a
+  10-minute show.
 
 ## License and credits
 

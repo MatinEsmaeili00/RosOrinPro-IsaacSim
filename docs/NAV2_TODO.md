@@ -102,7 +102,27 @@ harmonics degree 3, 946 MB.
 * ✅ README, TESTING (§ 6) and WORKLOG (§ 16 + open items): new sections and rows only.
 * ✅ Docs images: `tools/render_splat_docs.py` and `sensor_snapshot.py` → `docs/images/splat/`.
 
+### Phase 7: demos (asked for on 2026-11-05, after the first push)
+* ✅ `docs/NAV2_DEMOS.md`: eight demos with steps, things to point out and how each was tested, plus a
+  10-minute show.
+* ✅ Surprise obstacle: `--obstacle X,Y[,SIZE]` in `launch/run_headless.py` and `tests/test_nav2.py`; `--tag` keeps
+  extra reports apart. Box on the baseline path → the robot passed 0.69 m to the side, 1/1, no recovery
+  (`report_nav2_splat_obstacle.json` vs `report_nav2_splat_baseline.json`).
+* ✅ Waypoints: Nav2's `FollowWaypoints` and `NavigateThroughPoses` (the RViz waypoint buttons) both succeeded,
+  17.5 m past the box.
+* ✅ Goal tool retries while Nav2 is still activating. Found because a goal sent right after bringup was
+  rejected: localization was up 7 s before bt_navigator.
+* ✅ Ctrl+C (or Ctrl+Break) on the goal tool now cancels the goal. Before, the tool exited but Nav2 kept driving:
+  measured, the robot went on from (3.59, 1.75) to (5.72, 6.82). Now it stops where it is (5 cm). The signal
+  only sets a flag, because an exception raised inside rclpy's C++ code arrives as a RuntimeError.
+* ✅ RViz: top-down view follows the robot (x right, like the map pictures); a "Robot camera" group (off) with
+  the wrist RGB image and depth points.
+* ✅ Wrist camera "look ahead" poses for the demos, worked out from the URDF: `joint4` = 0 is level, 0.35 is 20° down.
+
 ### Open items (for you to decide or for a next session)
+* ⬜ No camera images in a **headless** run of the splat building with cameras on: `sensor_snapshot.py` got
+  no `/depth_cam/...` messages, although the camera graph started. In the GUI the camera works (6/6). It
+  matters only for `run_nav2_test.bat --cameras`.
 * ⬜ Run `rosorin_nav2` on the real robot (`use_sim_time:=False`), see `docs/NAV2.md` "On the real robot".
 * ⬜ SLAM accuracy: slam_toolbox drifts 0.3–0.8 m in the simulation. Suspects are listed in WORKLOG
   "Not done / open items".
@@ -138,3 +158,9 @@ harmonics degree 3, 946 MB.
   at the spawn pose, not at the scene origin. Fixed with the goal tool's `--slam` flag. Then 3/5 (far
   unexplored goals cannot be planned, the SLAM pose drifts up to 0.64 m). Documented. AMCL on the generated
   map is the recommended way to navigate the building.
+* **2026-11-05 (evening):** demos guide (`docs/NAV2_DEMOS.md`). New checks for it: surprise obstacle (box on
+  the path, 1/1, passed 0.69 m to the side), RViz waypoint actions (both succeeded), goal right after bringup
+  (found and fixed a race: rejected while bt_navigator was still activating), Ctrl+C on the goal tool (found
+  and fixed: the goal was not cancelled, so the robot drove on). Put back the `r` prefix of
+  `teleop_keyboard.py`'s docstring in the local copy; without it, `\r` and `\t` in its Windows paths are
+  control characters. The version on GitHub was already right.

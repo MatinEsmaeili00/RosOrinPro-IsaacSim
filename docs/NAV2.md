@@ -6,6 +6,7 @@ the test arena), and the `rosorin_nav2` package is meant to run on the real robo
 
 * Scene and map of the splat building: [SPLAT_ENVIRONMENT.md](SPLAT_ENVIRONMENT.md)
 * Progress and to-do list of this work: [NAV2_TODO.md](NAV2_TODO.md)
+* Demos to show, step by step: [NAV2_DEMOS.md](NAV2_DEMOS.md)
 
 ## How the pieces talk
 
@@ -84,7 +85,11 @@ pixi run nav world:=splat map:=C:/path/to/my_map.yaml
 ```bat
 launch\run_nav2_test.bat                         :: splat building, AMCL, full tour
 launch\run_nav2_test.bat --world arena --slam    :: arena, slam_toolbox
+launch\run_nav2_test.bat --place north_hall --obstacle 5.37,6.0   :: a box that is not on the map
 ```
+
+`--obstacle X,Y[,SIZE]` (repeatable) adds a box through `launch\run_headless.py --obstacle`, and `--tag NAME`
+adds a suffix to the report and log names, so that extra runs do not overwrite the main report.
 
 It starts the headless simulation, waits for `/scan`, starts Nav2, runs the tour, stops everything and writes
 `tests/results/report_nav2_<world>.json` plus the logs of the three processes.
@@ -100,7 +105,8 @@ nav2/rosorin_nav2/                the ROS 2 package (ament_python), also for the
   launch/bringup.launch.py        wraps nav2_bringup/bringup_launch.py: world:= slam:= map:= initial_pose:= rviz:= use_sim_time:=
   maps/                           splat_building (from the splat), test_arena (from the arena's colliders)
   rosorin_nav2/goal.py            `ros2 run rosorin_nav2 goal`: goals, places, tours, JSON report
-  rviz/rosorin_nav2.rviz          Nav2's default RViz layout
+  rviz/rosorin_nav2.rviz          Nav2's default RViz layout; top-down view that follows the robot, and a
+                                  "Robot camera" group (off by default): wrist RGB image + depth points
 ```
 
 The goal tool is part of the package and not in `ros2_tools\`, because it needs `nav2_msgs`, which Isaac
@@ -150,6 +156,7 @@ ros2 launch rosorin_nav2 bringup.launch.py use_sim_time:=False map:=/path/room.y
 |---|---|
 | `ros2 topic list` hangs on Windows | The ros2 CLI daemon. Use `pixi run topics` (`--no-daemon`), and `pixi run ros2 daemon stop` to end a stuck daemon. |
 | `Failed to load map yaml file: C:isaac-sim...` (no backslashes) | nav2_bringup drops backslashes in the map path. `bringup.launch.py` converts paths to `/`. Pass your own maps with forward slashes too. |
+| `[goal] rejected (is Nav2 still starting?), trying again in 2 s` | Normal for a few seconds after `pixi run nav`: localization is up before the navigator is active. The goal tool retries for 60 s. |
 | Nav2 waits forever for the transform `map → base_footprint` | Is the simulation playing? Is the initial pose right (`world:=` must match the scene that is open)? |
 | No topics between the simulator and Nav2 | Both must use domain 0 (or the same `ROS_DOMAIN_ID`) and `rmw_fastrtps_cpp`. Allow Isaac Sim and pixi's `python.exe` in the Windows firewall. |
 | `Control loop missed its desired rate` | The MPPI controller needs more CPU than available. Lower `batch_size` (1500 → 1000) or `controller_frequency` (20 → 10) in `nav2_params.yaml`. |

@@ -231,6 +231,20 @@ The report lists each goal with its time, distance, final error, and (simulation
 error and AMCL's localization error. Measured: true error 4–11 cm, localization error 2–10 cm. The logs of
 the simulator, Nav2 and the goal tool are next to the report (`tests\results\nav2_<world>_*.log`).
 
+**6d. An obstacle that is not on the map** (added 5 November 2026):
+
+```bat
+launch\run_nav2_test.bat --place north_hall --tag baseline                 :: without the box
+launch\run_nav2_test.bat --place north_hall --obstacle 5.37,6.0 --rviz     :: 40 cm box on that path
+```
+
+`--obstacle X,Y[,SIZE]` adds a red box with a collider in the simulation only, so Nav2 has to see it with
+the lidar. The box stands on the line the robot drives without it. Expected: `PASS: 1/1 goals` in both runs.
+Measured: without the box, the robot's path passes through `(5.37, 6.0)`. With the box, it passes 0.69 m to the
+right, its centre 0.46 m from the box, and it stops 10.5 cm from the target with no recovery
+(`report_nav2_splat_obstacle.json`, `report_nav2_splat_baseline.json`). It is demo 5 in
+[NAV2_DEMOS.md](NAV2_DEMOS.md).
+
 ## From another computer (Linux, Jetson, WSL)
 
 Any ROS 2 Humble machine on the same network sees the simulator:
