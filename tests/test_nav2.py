@@ -3,6 +3,7 @@ r"""End-to-end Nav2 test: headless simulation + Nav2 (AMCL or SLAM) + a tour of 
     launch\run_nav2_test.bat                       splat building, AMCL on the generated map, full tour
     launch\run_nav2_test.bat --world arena --slam  test arena, mapping with slam_toolbox while driving
     launch\run_nav2_test.bat --world splat --place conference_room
+    launch\run_nav2_test.bat --place north_hall --obstacle 3.65,2.0   box on the path, not in the map
 
 Steps: start launch\run_headless.bat on the world's scene, wait until the pixi ROS 2 sees /scan, start
 `ros2 launch rosorin_nav2 bringup.launch.py`, run `ros2 run rosorin_nav2 goal --tour` and write
@@ -95,11 +96,15 @@ def main():
     ap.add_argument("--goal-timeout", type=float, default=900.0, help="wall seconds per goal")
     ap.add_argument("--cameras", action="store_true", help="keep the depth-camera graph on (slower)")
     ap.add_argument("--rviz", action="store_true", help="open RViz too")
+    ap.add_argument("--obstacle", action="append", default=[], metavar="X,Y[,SIZE]",
+                    help="add a box that is not in the map (see launch/run_headless.py); repeatable")
+    ap.add_argument("--tag", default="", help="suffix for the report and log names, e.g. baseline")
     args = ap.parse_args()
 
     pixi = find_pixi()
     os.makedirs(RESULTS, exist_ok=True)
-    tag = args.world + ("_slam" if args.slam else "")
+    tag = args.world + ("_slam" if args.slam else "") + ("_obstacle" if args.obstacle else "")
+    tag += ("_" + args.tag) if args.tag else ""
     logs = {k: os.path.join(RESULTS, "nav2_%s_%s.log" % (tag, k)) for k in ("sim", "nav2", "goal")}
     report_path = os.path.join(RESULTS, "report_nav2_%s.json" % tag)
     goal_json = os.path.join(RESULTS, "nav2_%s_goals.json" % tag)
@@ -109,6 +114,8 @@ def main():
 
     report = {"world": args.world, "slam": args.slam, "scene": os.path.relpath(scene, REPO).replace("\\", "/"),
               "date": time.strftime("%Y-%m-%d %H:%M"), "ok": False}
+    if args.obstacle:
+        report["obstacles"] = args.obstacle
     sim = nav = None
     t0 = time.time()
     try:
@@ -117,6 +124,8 @@ def main():
         sim_cmd = ["cmd", "/c", os.path.join(REPO, "launch", "run_headless.bat"), "--scene", scene]
         if not args.cameras:
             sim_cmd.append("--no-cameras")
+        for spec in args.obstacle:
+            sim_cmd += ["--obstacle", spec]
         print("[test_nav2] starting the simulation:", report["scene"], flush=True)
         sim = start(sim_cmd, logs["sim"], REPO)
         if not wait_for_log(logs["sim"], ["headless simulation running"], sim, 900):

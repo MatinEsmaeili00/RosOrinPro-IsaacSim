@@ -16,6 +16,7 @@ import argparse
 import json
 import math
 import os
+import signal
 import sys
 import time
 
@@ -28,6 +29,7 @@ from nav2_msgs.action import NavigateToPose
 from nav_msgs.msg import Odometry
 from rclpy.action import ActionClient
 from rclpy.duration import Duration
+from rclpy.signals import SignalHandlerOptions
 from rclpy.node import Node
 from rclpy.parameter import Parameter
 from rclpy.time import Time
@@ -35,6 +37,14 @@ from tf2_ros import Buffer, TransformListener
 
 STATUS = {GoalStatus.STATUS_SUCCEEDED: "SUCCEEDED", GoalStatus.STATUS_ABORTED: "ABORTED",
           GoalStatus.STATUS_CANCELED: "CANCELED", GoalStatus.STATUS_UNKNOWN: "UNKNOWN"}
+STOP = []  # not empty after Ctrl+C / Ctrl+Break
+
+
+def _on_stop_signal(signum, frame):  # noqa: ARG001
+    if STOP:  # pressed a second time: quit at once
+        raise KeyboardInterrupt
+    STOP.append(signum)
+    print("\n[goal] Ctrl+C: stopping the robot (press again to quit at once)", flush=True)
 
 
 def yaw_to_quat(yaw):
@@ -94,7 +104,7 @@ class GoalClient(Node):
     def wait_ready(self, timeout):
         """Wait until the navigate_to_pose server exists and map -> base_footprint resolves."""
         start = time.monotonic()
-        while time.monotonic() - start < timeout:
+        while time.monotonic() - start < timeout and not STOP:
             if self.client.server_is_ready() and self.robot_pose() is not None:
                 return True
             self.spin_for(0.5)
@@ -111,17 +121,35 @@ class GoalClient(Node):
         goal.pose.pose.orientation.x, goal.pose.pose.orientation.y = qx, qy
         goal.pose.pose.orientation.z, goal.pose.pose.orientation.w = qz, qw
 
-        d0, t0, w0 = self.odom_dist, self.get_clock().now(), time.monotonic()
-        send = self.client.send_goal_async(goal)
-        while not send.done():
-            rclpy.spin_once(self, timeout_sec=0.05)
-        handle = send.result()
+        # Right after bringup, localization (and so the TF that wait_ready() checks) can be up a few seconds
+        # before bt_navigator is active, and an inactive navigator rejects goals: retry for up to 60 s.
+        retry_until = time.monotonic() + 60.0
+        while True:
+            send = self.client.send_goal_async(goal)
+            while not send.done():
+                rclpy.spin_once(self, timeout_sec=0.05)
+            handle = send.result()
+            if handle.accepted or STOP or time.monotonic() > retry_until:
+                break
+            print("[goal]    rejected (is Nav2 still starting?), trying again in 2 s", flush=True)
+            self.spin_for(2.0)
         if not handle.accepted:
-            return {"status": "REJECTED"}
+            return {"status": "CANCELED" if STOP else "REJECTED"}
+        d0, t0, w0 = self.odom_dist, self.get_clock().now(), time.monotonic()
         res = handle.get_result_async()
         last_print = 0.0
         while not res.done():
             rclpy.spin_once(self, timeout_sec=0.05)
+            if STOP:
+                # Ctrl+C: cancel the goal, otherwise Nav2 keeps driving to it after this tool has exited
+                cancel = handle.cancel_goal_async()
+                end = time.monotonic() + 5.0
+                while not cancel.done() and time.monotonic() < end:
+                    rclpy.spin_once(self, timeout_sec=0.05)
+                print("[goal]    %s" % ("goal cancelled, the robot stops" if cancel.done()
+                                        else "cancel request sent, no answer from Nav2"), flush=True)
+                status = "CANCELED"
+                break
             if time.monotonic() - w0 > timeout:
                 handle.cancel_goal_async()
                 self.spin_for(1.0)
@@ -203,7 +231,13 @@ def main(argv=None):
     if not goals:
         ap.error("give x y [yaw], --place NAME or --tour")
 
-    rclpy.init(args=argv)
+    # Ctrl+C / Ctrl+Break only set a flag; the loops then cancel the running goal. rclpy's own handler would shut
+    # the ROS context down at once (no way left to cancel), and an exception raised inside rclpy's C++ code
+    # turns into a RuntimeError instead of a KeyboardInterrupt.
+    rclpy.init(args=argv, signal_handler_options=SignalHandlerOptions.NO)
+    signal.signal(signal.SIGINT, _on_stop_signal)
+    if hasattr(signal, "SIGBREAK"):
+        signal.signal(signal.SIGBREAK, _on_stop_signal)
     node = GoalClient(args.use_sim_time.strip().lower() in ("1", "true", "yes"))
     if args.ground_truth:
         if args.world not in worlds:
@@ -221,11 +255,15 @@ def main(argv=None):
         p = node.robot_pose()
         print("[goal] robot at (%.2f, %.2f, %.0f deg)" % (p[0], p[1], math.degrees(p[2])), flush=True)
         for name, x, y, yaw in goals:
+            if STOP:
+                break
             print("[goal] -> %s (%.2f, %.2f, %.0f deg)" % (name, x, y, yaw), flush=True)
             r = node.go(x, y, yaw, args.timeout)
             r.update({"name": name, "target": [x, y, yaw]})
             results.append(r)
             print("[goal]    %s" % json.dumps(r), flush=True)
+    except KeyboardInterrupt:  # second Ctrl+C
+        print("[goal] stopped by Ctrl+C", flush=True)
     finally:
         ok = bool(results) and all(r["status"] == "SUCCEEDED" for r in results)
         summary = {"ok": ok, "goals": results}

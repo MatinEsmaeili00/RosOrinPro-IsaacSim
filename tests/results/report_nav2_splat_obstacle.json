@@ -1,0 +1,50 @@
+{
+  "world": "splat",
+  "slam": false,
+  "scene": "scenes/splat_world.usd",
+  "date": "2026-11-05 18:23",
+  "ok": true,
+  "obstacles": [
+    "5.37,6.0"
+  ],
+  "sim_start_s": 45.5,
+  "goals": [
+    {
+      "status": "SUCCEEDED",
+      "sim_time_s": 46.2,
+      "wall_time_s": 80.23,
+      "distance_m": 13.637,
+      "final_pose": [
+        7.198,
+        12.606,
+        64.7
+      ],
+      "position_error_m": 0.128,
+      "yaw_error_deg": 5.3,
+      "true_pose": [
+        7.187,
+        12.634,
+        64.0
+      ],
+      "true_position_error_m": 0.105,
+      "localization_error_m": 0.03,
+      "localization_yaw_error_deg": 0.8,
+      "name": "north_hall",
+      "target": [
+        7.23,
+        12.73,
+        70.0
+      ]
+    }
+  ],
+  "goal_exit_code": 0,
+  "wall_s": 152.4,
+  "summary": {
+    "succeeded": 1,
+    "goals": 1,
+    "distance_m": 13.64,
+    "sim_time_s": 46.2,
+    "max_true_position_error_m": 0.105,
+    "max_localization_error_m": 0.03
+  }
+}
